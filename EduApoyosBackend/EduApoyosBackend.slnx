@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Application/">
+    <Project Path="EduApoyosBackend.API/EduApoyosBackend.API.csproj" />
+  </Folder>
+  <Folder Name="/Domain/" />
+  <Folder Name="/Infrastructure/" />
+  <Folder Name="/Testing/">
+    <Project Path="EduApoyosBackend.Tests/EduApoyosBackend.Tests.csproj" />
+  </Folder>
+</Solution>
