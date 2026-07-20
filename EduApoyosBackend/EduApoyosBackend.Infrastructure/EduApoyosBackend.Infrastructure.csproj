@@ -6,4 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Persistence\Context\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EduApoyosBackend.Domain\EduApoyosBackend.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
