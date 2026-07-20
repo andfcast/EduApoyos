@@ -1,9 +1,12 @@
-
 using EduApoyosBackend.Application.Interfaces;
 using EduApoyosBackend.Application.Services;
 using EduApoyosBackend.Domain.Repositories;
 using EduApoyosBackend.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Identity;
+using EduApoyosBackend.Infrastructure.Persistence.Context;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace EduApoyosBackend.API
 {
@@ -18,12 +21,14 @@ namespace EduApoyosBackend.API
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
             builder.Logging.AddDebug();
-
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+                    b => b.MigrationsAssembly("EduApoyosBackend.Infrastructure"))); // Las migraciones se registran desde la API
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
             builder.Services.AddScoped<ITokenService, JwtTokenService>();
 
-            builder.Services.AddScoped<IAuthService, AuthService>();                  
+            builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IRolService, RolService>();
             builder.Services.AddScoped<IUsuarioService, UsuarioService>();
             builder.Services.AddScoped<IEstudianteService, EstudianteService>();
@@ -33,12 +38,30 @@ namespace EduApoyosBackend.API
             //builder.Services.AddScoped<ISolicitudApoyoService, SolicitudApoyoService>();
             //builder.Services.AddScoped<IHistorialEstadoService, HistorialEstadoService>();
 
-
+            builder.Services.AddAuthentication(opt =>
+            {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(opt =>
+            {
+                opt.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+                };
+            });
+            builder.Services.AddAuthorization();
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
+            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -50,6 +73,7 @@ namespace EduApoyosBackend.API
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
