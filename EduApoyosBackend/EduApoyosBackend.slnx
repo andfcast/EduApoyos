@@ -9,7 +9,6 @@
   <Folder Name="/Infrastructure/">
     <Project Path="EduApoyosBackend.Infrastructure/EduApoyosBackend.Infrastructure.csproj" Id="c1af4299-ee4f-4991-9d12-837d544e49b8" />
   </Folder>
-  <Folder Name="/Infrastructure/Security/" />
   <Folder Name="/Testing/">
     <Project Path="EduApoyosBackend.Tests/EduApoyosBackend.Tests.csproj" />
   </Folder>
