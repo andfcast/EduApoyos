@@ -1,8 +1,10 @@
+using EduApoyosBackend.API.Middlewares;
 using EduApoyosBackend.Application.Interfaces;
 using EduApoyosBackend.Application.Services;
 using EduApoyosBackend.Domain.Repositories;
 using EduApoyosBackend.Infrastructure.Persistence;
 using EduApoyosBackend.Infrastructure.Persistence.Context;
+using EduApoyosBackend.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -63,6 +65,8 @@ namespace EduApoyosBackend.API
             builder.Services.AddSwaggerGen();
             
             var app = builder.Build();
+            
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

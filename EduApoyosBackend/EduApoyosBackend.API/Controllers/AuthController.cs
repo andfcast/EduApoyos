@@ -12,23 +12,32 @@ namespace EduApoyosBackend.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, ILogger<AuthController> logger)
         {
             _authService = authService;
-        }   
+            _logger = logger;
+        }
         [AllowAnonymous]
         // POST api/<AuthController>
         [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            return Ok(await _authService.Login(dto));
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            _logger.LogInformation("Intento de inicio de sesión para el correo: {Email}", dto.Email);
+            var respuesta = await _authService.LoginAsync(dto);
+            return Ok(respuesta);
+
         }
         // POST api/<AuthController>
         [AllowAnonymous]
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] RegistroUsuarioDto dto)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            _logger.LogInformation("Intentando registrar un nuevo estudiante con correo: {Email}", dto.Email);
+            var resultado = await _authService.RegistrarEstudianteAsync(dto);
             return Ok();
         }
     }
