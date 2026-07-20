@@ -20,6 +20,6 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Repositories
         public async Task<bool> ExisteUsuarioConCorreoAsync(string email)
         {
             return await _context.Usuarios.AnyAsync(u => u.Email == email);
-        }
+        }        
     }
 }
