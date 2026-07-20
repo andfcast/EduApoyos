@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Decorators\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EduApoyosBackend.Domain\EduApoyosBackend.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

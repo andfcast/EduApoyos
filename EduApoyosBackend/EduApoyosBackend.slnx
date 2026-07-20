@@ -1,9 +1,14 @@
 <Solution>
   <Folder Name="/Application/">
     <Project Path="EduApoyosBackend.API/EduApoyosBackend.API.csproj" />
+    <Project Path="EduApoyosBackend.Application/EduApoyosBackend.Application.csproj" Id="746d7663-d18a-4d60-91be-cd11cd66ea7a" />
   </Folder>
-  <Folder Name="/Domain/" />
-  <Folder Name="/Infrastructure/" />
+  <Folder Name="/Domain/">
+    <Project Path="EduApoyosBackend.Domain/EduApoyosBackend.Domain.csproj" Id="08c7ac7e-f85c-44db-aa16-056a1241e937" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="EduApoyosBackend.Infrastructure/EduApoyosBackend.Infrastructure.csproj" Id="c1af4299-ee4f-4991-9d12-837d544e49b8" />
+  </Folder>
   <Folder Name="/Testing/">
     <Project Path="EduApoyosBackend.Tests/EduApoyosBackend.Tests.csproj" />
   </Folder>

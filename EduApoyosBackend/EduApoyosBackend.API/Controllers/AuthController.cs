@@ -1,0 +1,44 @@
+﻿using EduApoyosBackend.Application.DTOs;
+using EduApoyosBackend.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
+namespace EduApoyosBackend.API.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AuthController : ControllerBase
+    {
+        private readonly IAuthService _authService;
+        private readonly ILogger<AuthController> _logger;
+
+        public AuthController(IAuthService authService, ILogger<AuthController> logger)
+        {
+            _authService = authService;
+            _logger = logger;
+        }
+        [AllowAnonymous]
+        // POST api/<AuthController>
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            _logger.LogInformation("Intento de inicio de sesión para el correo: {Email}", dto.Email);
+            var respuesta = await _authService.LoginAsync(dto);
+            return Ok(respuesta);
+
+        }
+        // POST api/<AuthController>
+        [AllowAnonymous]
+        [HttpPost("Register")]
+        public async Task<IActionResult> Register([FromBody] RegistroUsuarioDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            _logger.LogInformation("Intentando registrar un nuevo estudiante con correo: {Email}", dto.Email);
+            var resultado = await _authService.RegistrarEstudianteAsync(dto);
+            return Ok();
+        }
+    }
+}
