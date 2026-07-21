@@ -23,6 +23,19 @@ namespace EduApoyosBackend.API
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
             builder.Logging.AddDebug();
+            var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+            // 2. Registrar el servicio CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: myAllowSpecificOrigins,
+                                  policy =>
+                                  {
+                                      policy.WithOrigins("http://localhost:4200") // Puerto por defecto de Angular
+                                            .AllowAnyHeader()
+                                            .AllowAnyMethod();
+                                  });
+            });
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
                     b => b.MigrationsAssembly("EduApoyosBackend.Infrastructure"))); // Las migraciones se registran desde la API
@@ -34,7 +47,7 @@ namespace EduApoyosBackend.API
             builder.Services.AddScoped<IRolService, RolService>();
             builder.Services.AddScoped<IUsuarioService, UsuarioService>();
             builder.Services.AddScoped<IEstudianteService, EstudianteService>();
-            //builder.Services.AddScoped<ITipoDocumentoService, TipoDocumentoService>();
+            builder.Services.AddScoped<ITipoDocumentoService, TipoDocumentoService>();
             //builder.Services.AddScoped<ITipoApoyoService, TipoApoyoService>();
             //builder.Services.AddScoped<IEstadoSolicitudService, EstadoSolicitudService>();
             //builder.Services.AddScoped<ISolicitudApoyoService, SolicitudApoyoService>();
@@ -76,7 +89,7 @@ namespace EduApoyosBackend.API
             }
 
             app.UseHttpsRedirection();
-
+            app.UseCors(myAllowSpecificOrigins);
             app.UseAuthentication();
             app.UseAuthorization();
 
