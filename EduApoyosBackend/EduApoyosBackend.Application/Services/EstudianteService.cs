@@ -95,6 +95,7 @@ namespace EduApoyosBackend.Application.Services
                     usuarioExistente.PasswordHash = _passwordHasher.Hash(dto.Password);
                 }
                 _unitOfWork.Usuarios.Actualizar(usuarioExistente);
+                await _unitOfWork.SaveChangesAsync();
             }
             
             _unitOfWork.Estudiantes.Actualizar(estudiante);

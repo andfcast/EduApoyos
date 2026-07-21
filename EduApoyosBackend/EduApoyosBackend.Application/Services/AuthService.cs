@@ -45,22 +45,6 @@ namespace EduApoyosBackend.Application.Services
                 Email = usuario.Email,
                 Rol = usuario.Rol?.Nombre ?? (usuario.RolId == 1 ? "Asesor" : "Estudiante")
             };
-        }
-
-        public async Task<string> RegistrarUsuarioAsync(RegistroUsuarioDto dto)
-        {
-            var existeUsuario = await _unitOfWork.Usuarios.ObtenerPorCorreoAsync(dto.Email);
-            if (existeUsuario != null)
-            {
-                throw new InvalidOperationException("El correo electrónico ya está en uso.");
-            }            
-            var nuevoUsuario = new Usuario(Guid.NewGuid(), dto.NombreCompleto, dto.Email, _passwordHasher.Hash(dto.Password), dto.RolId, DateTime.UtcNow);
-
-            await _unitOfWork.Usuarios.AgregarAsync(nuevoUsuario);
-
-            await _unitOfWork.SaveChangesAsync();            
-
-            return "Usuario registrado con éxito de manera segura.";
-        }
+        }        
     }
 }
