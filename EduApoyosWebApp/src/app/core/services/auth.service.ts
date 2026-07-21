@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { AuthResponseDto, LoginDto, SesionUsuario } from '../models/auth.models';
+import { LoginDto, SesionUsuario } from '../models/auth.models';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
 
@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private apiUrl = `${environment.apiUrl}/auth`; // Reemplaza por tu puerto local de la API
+  private apiUrl = `${environment.apiUrl}auth`; 
   private tokenKey = 'eduapoyos_jwt_token';
   private sessionKey = 'eduapoyos_session';
   private readonly hasLocalStorage = typeof localStorage !== 'undefined';
@@ -20,12 +20,17 @@ export class AuthService {
   isLoggedIn = computed(() => !!this.currentUser());
   userRole = computed(() => this.currentUser()?.rol ?? null);
 
-  login(credentials: LoginDto): Observable<AuthResponseDto> {
-    return this.http.post<AuthResponseDto>(`${this.apiUrl}/login`, credentials).pipe(
+  login(credentials: LoginDto): Observable<SesionUsuario> {
+    return this.http.post<SesionUsuario>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
         if (response?.token) {
-          this.setToken(response.token);
+          this.setToken(response.token);          
         }
+        this.guardarSesion(response);
+        this.currentUser.set(response);
+      
+      // 🚀 Aquí se dispara la navegación dinámica:
+      this.redirigirSegunRol(response.rol);
       })
     );
   }

@@ -1,0 +1,101 @@
+<div class="page-container">
+  
+  <header class="page-header">
+    <div>
+      <h2>Gestión de Estudiantes</h2>
+      <p class="subtitle">Directorio de estudiantes registrados en el sistema</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="abrirModalCrear()">
+      <mat-icon>person_add</mat-icon>
+      Nuevo Estudiante
+    </button>
+  </header>
+
+  <mat-card class="content-card">
+    
+    <div class="filter-container">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar estudiante</mat-label>
+        <input matInput (keyup)="aplicarFiltro($event)" placeholder="Por nombre, documento o correo..." #input>
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+
+    @if (isLoading()) {
+      <div class="loading-spinner">
+        <mat-spinner diameter="48"></mat-spinner>
+      </div>
+    } @else {
+      
+      <div class="table-responsive">
+        <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z0">
+
+          <!-- Documento -->
+          <ng-container matColumnDef="documento">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Documento </th>
+            <td mat-cell *matCellDef="let element"> {{ element.tipoDocumento }}: {{ element.numeroDocumento }} </td>
+          </ng-container>
+
+          <!-- Nombre -->
+          <ng-container matColumnDef="nombreCompleto">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre Completo </th>
+            <td mat-cell *matCellDef="let element" class="font-bold"> {{ element.nombreCompleto }} </td>
+          </ng-container>
+
+          <!-- Correo -->
+          <ng-container matColumnDef="correo">
+            <th mat-header-cell *matHeaderCellDef> Correo </th>
+            <td mat-cell *matCellDef="let element"> {{ element.correo }} </td>
+          </ng-container>
+
+          <!-- Programa -->
+          <ng-container matColumnDef="programa">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Programa </th>
+            <td mat-cell *matCellDef="let element"> {{ element.programaAcademico }} </td>
+          </ng-container>
+
+          <!-- Semestre -->
+          <ng-container matColumnDef="semestre">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-center"> Sem. </th>
+            <td mat-cell *matCellDef="let element" class="text-center"> {{ element.semestre }} </td>
+          </ng-container>
+
+          <!-- Estado -->
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef class="text-center"> Estado </th>
+            <td mat-cell *matCellDef="let element" class="text-center">
+              <mat-chip-option [color]="element.activo ? 'primary' : 'warn'" selected readonly>
+                {{ element.activo ? 'Activo' : 'Inactivo' }}
+              </mat-chip-option>
+            </td>
+          </ng-container>
+
+          <!-- Acciones -->
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef class="text-center"> Acciones </th>
+            <td mat-cell *matCellDef="let element" class="text-center">
+              <button mat-icon-button color="primary" (click)="abrirModalEditar(element)" title="Editar">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="eliminarEstudiante(element)" title="Inactivar / Eliminar">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell empty-table" colspan="7">
+              No se encontraron coincidencias para "{{ input.value }}"
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons></mat-paginator>
+
+    }
+  </mat-card>
+</div>

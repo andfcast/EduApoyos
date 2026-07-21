@@ -30,7 +30,7 @@ import { AuthService } from '../../core/services/auth.service';
 export class MainLayoutComponent {
   public authService = inject(AuthService);
 
-  onLogout(): void {
+  logout(): void {
     this.authService.logout();
   }
 }

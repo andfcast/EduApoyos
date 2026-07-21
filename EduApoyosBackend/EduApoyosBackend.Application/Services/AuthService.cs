@@ -41,7 +41,9 @@ namespace EduApoyosBackend.Application.Services
                 Token = token,
                 Mensaje = "Autenticación exitosa.",
                 UsuarioId = usuario.Id,
-                Nombre = usuario.NombreCompleto
+                Nombre = usuario.NombreCompleto,
+                Email = usuario.Email,
+                Rol = usuario.Rol?.Nombre ?? (usuario.RolId == 1 ? "Asesor" : "Estudiante")
             };
         }
 

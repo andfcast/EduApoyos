@@ -14,6 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { RolService } from '../../../core/services/rol.service';
 import { Rol } from '../../../core/models/usuario.models';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-registrar-usuario-component',
@@ -21,6 +22,7 @@ import { Rol } from '../../../core/models/usuario.models';
     ReactiveFormsModule,
     RouterLink,
     MatCardModule,
+    MatIconModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -40,6 +42,7 @@ export class RegistrarUsuarioComponent implements OnInit {
 
   roles = signal<Rol[]>([]);
   isLoading = signal<boolean>(false);
+  hidePassword = signal<boolean>(true);
 
   // Mismo patrón de contraseña requerido por el backend
   private passwordPattern = '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&._-]).{8,}$';
@@ -53,6 +56,10 @@ export class RegistrarUsuarioComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarRoles();
+  }
+
+  togglePasswordVisibility(): void {
+    this.hidePassword.update((visible) => !visible);
   }
 
   private cargarRoles(): void {

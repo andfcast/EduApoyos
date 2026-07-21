@@ -11,7 +11,7 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/login-component/login-component').then(m => m.LoginComponent) 
   },
   { 
-    path: 'registro', // 👈 Ruta que se enlaza desde el Login
+    path: 'registro',
     loadComponent: () => import('./features/auth/registrar-usuario-component/registrar-usuario-component').then(m => m.RegistrarUsuarioComponent) 
   },
   // Contenedor principal protegido por autenticación
@@ -24,8 +24,20 @@ export const routes: Routes = [
       {
         path: 'asesor',
         canActivate: [roleGuard('Asesor')],
-        loadComponent: () => import('./features/dashboard/asesor-dashboard-component/asesor-dashboard-component').then(m => m.AsesorDashboardComponent)
-      }    
+        loadComponent: () => import('./features/dashboard/asesor-dashboard-component/asesor-dashboard-component').then(m => m.AsesorDashboardComponent)        
+      },
+      {
+        path: 'estudiantes',
+        canActivate: [roleGuard('Asesor')],
+        loadComponent: () => import('./features/estudiantes/lista-estudiantes-component/lista-estudiantes-component').then(m => m.ListaEstudiantesComponent)
+      }, 
+
+      // Rutas para Estudiante
+      {
+        path: 'estudiante',
+        canActivate: [roleGuard('Estudiante')],
+        loadComponent: () => import('./features/dashboard/estudiante-dashboard-component/estudiante-dashboard-component').then(m => m.EstudianteDashboardComponent)
+      },    
     ]
   },
   { path: '**', redirectTo: 'login' }

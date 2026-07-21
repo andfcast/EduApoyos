@@ -3,15 +3,11 @@ export interface LoginDto {
   password: string;
 }
 
-export interface AuthResponseDto {
-  token: string;
-  email: string;
-  nombre: string;
-}
-
 export interface SesionUsuario {
-  nombre: string;
-  email: string;
-  rol: 'Asesor' | 'Estudiante';
   token: string;
+  Mensaje: string;
+  nombre: string;
+  usuarioId: string;
+  email: string;
+  rol: 'Asesor' | 'Estudiante';  
 }

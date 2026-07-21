@@ -1,0 +1,8 @@
+.dialog-content { padding-top: 8px; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .full-width { grid-column: span 2; }
+    .toggle-container { padding: 8px 0; }

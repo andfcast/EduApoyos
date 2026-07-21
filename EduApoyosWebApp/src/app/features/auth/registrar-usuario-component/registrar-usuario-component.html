@@ -35,7 +35,16 @@
         <!-- Contraseña -->
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Contraseña</mat-label>
-          <input matInput type="password" formControlName="password" />
+          <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" />
+          <button 
+            mat-icon-button 
+            matSuffix 
+            type="button"
+            (click)="togglePasswordVisibility()" 
+            [attr.aria-label]="'Ocultar contraseña'" 
+            [attr.aria-pressed]="hidePassword()">
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
           @if (registerForm.get('password')?.hasError('required')) {
             <mat-error>La contraseña es obligatoria.</mat-error>
           }

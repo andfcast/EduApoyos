@@ -2,8 +2,8 @@ import { Service } from '@angular/core';
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { RegistroEstudiante,Estudiante } from '../models/estudiante.models';
 import { environment } from '../../../environments/environment';
+import { RegistroUsuario } from '../models/usuario.models';
 
 @Injectable({
   providedIn: 'root'
@@ -11,23 +11,14 @@ import { environment } from '../../../environments/environment';
 export class UsuarioService {
     private http = inject(HttpClient);
   // Toma la URL base definida en environment.ts/development.ts y le concatena la ruta
-  private apiAuthUrl = `${environment.apiUrl}/auth`;
-  private apiEstudianteUrl = `${environment.apiUrl}/estudiantes`;
-
+  private apiUrl = `${environment.apiUrl}auth`;
+  
   /**
-   * Registra un nuevo estudiante en el sistema.
-   * @param estudiante Objeto con la información requerida (documento, nombres, apellidos, email)
+   * Registra un nuevo usuario en el sistema.
+   * @param usuario Objeto con la información requerida (nombreCompleto, email, password, rolId)
    */
-  registrar(estudiante: RegistroEstudiante): Observable<RegistroEstudiante> {
-    return this.http.post<RegistroEstudiante>(this.apiAuthUrl + '/Register', estudiante);
+  registrar(usuario: RegistroUsuario): Observable<RegistroUsuario> {
+    return this.http.post<RegistroUsuario>(this.apiUrl + '/Register', usuario);
   }
 
-  /**
-   * Obtiene la información de un estudiante dado su ID.
-   * (Requiere token de autenticación que adjuntará automáticamente el jwtInterceptor)
-   * @param id Identificador único del estudiante
-   */
-  obtenerPorId(id: number): Observable<Estudiante> {
-    return this.http.get<Estudiante>(`${this.apiEstudianteUrl}/${id}`);
-  }
 }

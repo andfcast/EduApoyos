@@ -16,6 +16,7 @@ namespace EduApoyosBackend.Domain.Entities
         public string NumeroDocumento { get; private set; }
         public string ProgramaAcademico { get; private set; }
         public int Semestre { get; private set; }
+        public bool Activo { get; set; } = true;
         public ICollection<SolicitudApoyo> Solicitudes { get; private set; } = new List<SolicitudApoyo>();
 
         public Estudiante(Guid id, Guid usuarioId, int tipoDocumentoId, string numeroDocumento, string programaAcademico, int semestre)

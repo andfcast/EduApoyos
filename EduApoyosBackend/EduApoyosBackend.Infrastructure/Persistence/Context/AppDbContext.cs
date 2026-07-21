@@ -54,6 +54,7 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Context
 
             modelBuilder.Entity<Estudiante>(b => {
                 b.ToTable("Estudiantes").HasKey(e => e.Id);
+                b.Property(e => e.Activo).HasDefaultValue(true);
                 b.HasOne(e => e.Usuario).WithOne().HasForeignKey<Estudiante>(e => e.UsuarioId).OnDelete(DeleteBehavior.Cascade);
                 b.HasOne(e => e.TipoDocumento).WithMany().HasForeignKey(e => e.TipoDocumentoId).OnDelete(DeleteBehavior.Restrict);
             });
