@@ -76,6 +76,7 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Context
                 b.HasOne(s => s.Estudiante).WithMany(e => e.Solicitudes).HasForeignKey(s => s.EstudianteId).OnDelete(DeleteBehavior.Cascade);
                 b.HasOne(s => s.EstadoSolicitud).WithMany().HasForeignKey(s => s.EstadoSolicitudId).OnDelete(DeleteBehavior.Restrict);
                 b.HasOne(s => s.TipoApoyo).WithMany().HasForeignKey(s => s.TipoApoyoId).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(s => s.Asesor).WithMany().HasForeignKey(s => s.AsesorId).OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<HistorialEstado>(b => {

@@ -15,14 +15,22 @@ namespace EduApoyosBackend.Domain.Entities
         public TipoApoyo TipoApoyo { get; private set; } = null!;
         public string Descripcion { get; private set; }
         public int EstadoSolicitudId { get; private set; }
+        public Guid AsesorId { get; private set; }
+        public Usuario Asesor { get; set; }
         public EstadoSolicitud EstadoSolicitud { get; private set; } = null!;
         public DateTime FechaSolicitud { get; private set; }
         public DateTime FechaActualizacion { get; private set; }
         public ICollection<HistorialEstado> HistorialEstados { get; private set; } = new List<HistorialEstado>();
 
-        public SolicitudApoyo(Guid id, Guid estudianteId, int tipoApoyoId, string descripcion, int estadoSolicitudId, DateTime fechaSolicitud, DateTime fechaActualizacion)
+        public SolicitudApoyo(Guid id, Guid estudianteId, int tipoApoyoId, string descripcion, int estadoSolicitudId, DateTime fechaSolicitud, DateTime fechaActualizacion, Guid asesorId)
         {
-            Id = id; EstudianteId = estudianteId; TipoApoyoId = tipoApoyoId; Descripcion = descripcion; EstadoSolicitudId = estadoSolicitudId; FechaSolicitud = fechaSolicitud; FechaActualizacion = fechaActualizacion;
+            Id = id; EstudianteId = estudianteId; 
+            TipoApoyoId = tipoApoyoId; 
+            Descripcion = descripcion; 
+            EstadoSolicitudId = estadoSolicitudId; 
+            FechaSolicitud = fechaSolicitud; 
+            FechaActualizacion = fechaActualizacion;
+            AsesorId = asesorId;            
         }
 
         public void ActualizarEstado(int nuevoEstadoId)

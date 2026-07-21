@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EduApoyosBackend.Application.DTOs;
+using EduApoyosBackend.Application.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,11 +10,19 @@ namespace EduApoyosBackend.API.Controllers
     [ApiController]
     public class TiposApoyoController : ControllerBase
     {
-        // GET: api/<TiposApoyoController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly ITipoApoyoService _service;
+
+        public TiposApoyoController(ITipoApoyoService service)
         {
-            return new string[] { "value1", "value2" };
-        }       
+            _service = service;
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TipoApoyoDto>))]
+        public async Task<IActionResult> Get()
+        {
+            var result = await _service.ObtenerTiposApoyoAsync();
+            return Ok(result);
+        }
     }
 }
