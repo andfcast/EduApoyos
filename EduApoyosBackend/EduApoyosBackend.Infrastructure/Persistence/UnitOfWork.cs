@@ -1,4 +1,6 @@
 ﻿using EduApoyosBackend.Domain.Repositories;
+using EduApoyosBackend.Infrastructure.Persistence.Context;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,32 +9,82 @@ using System.Threading.Tasks;
 
 namespace EduApoyosBackend.Infrastructure.Persistence
 {
-    public class UnitOfWork : IUnitOfWork
+    public class UnitOfWork : IUnitOfWork, IDisposable, IAsyncDisposable
     {
-        public IUsuarioRepository Usuarios => throw new NotImplementedException();
+        private readonly AppDbContext _context;
+        private bool _disposed = false;
 
-        public IRolRepository Roles => throw new NotImplementedException();
+        private IUsuarioRepository? _usuarios;
 
-        public ITipoDocumentoRepository TiposDocumento => throw new NotImplementedException();
+        public IUsuarioRepository Usuarios => _usuarios ??= new Repositories.UsuarioRepository(_context);
 
-        public ITipoApoyoRepository TiposApoyo => throw new NotImplementedException();
+        private IRolRepository? _roles;
+        public IRolRepository Roles => _roles ??= new Repositories.RolRepository(_context);
 
-        public IEstadoSolicitudRepository EstadosSolicitud => throw new NotImplementedException();
+        private ITipoDocumentoRepository? _tiposDocumento;
+        public ITipoDocumentoRepository TiposDocumento => _tiposDocumento ??= new Repositories.TipoDocumentoRepository(_context);
 
-        public IEstudianteRepository Estudiantes => throw new NotImplementedException();
+        private ITipoApoyoRepository? _tiposApoyo;
+        public ITipoApoyoRepository TiposApoyo => _tiposApoyo ??= new Repositories.TipoApoyoRepository(_context);
 
-        public ISolicitudApoyoRepository Solicitudes => throw new NotImplementedException();
+        private IEstadoSolicitudRepository? _estadosSolicitud;
+        public IEstadoSolicitudRepository EstadosSolicitud => _estadosSolicitud ??= new Repositories.EstadoSolicitudRepository(_context);
 
-        public IHistorialEstadoRepository HistorialEstados => throw new NotImplementedException();
+        private IEstudianteRepository? _estudiantes;
+        public IEstudianteRepository Estudiantes => _estudiantes ??= new Repositories.EstudianteRepository(_context);
+
+        private ISolicitudApoyoRepository? _solicitudes;
+        public ISolicitudApoyoRepository Solicitudes => _solicitudes ??= new Repositories.SolicitudApoyoRepository(_context);
+
+        private IHistorialEstadoRepository? _historialEstados;
+        public IHistorialEstadoRepository HistorialEstados => _historialEstados ??= new Repositories.HistorialEstadoRepository(_context);
+
+        public UnitOfWork(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return await _context.SaveChangesAsync(cancellationToken);
+        }
+        // Liberación sincrónica de recursos
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _context.Dispose();
+                }
+                _disposed = true;
+            }
+        }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        public Task<int> SaveChangesAsync()
+        // Liberación asincrónica requerida por el contenedor de dependencias de ASP.NET Core
+        public async ValueTask DisposeAsync()
         {
-            throw new NotImplementedException();
+            if (!_disposed)
+            {
+                if (_context is IAsyncDisposable asyncDisposable)
+                {
+                    await asyncDisposable.DisposeAsync();
+                }
+                else
+                {
+                    _context.Dispose();
+                }
+
+                _disposed = true;
+            }
+
+            GC.SuppressFinalize(this);
         }
     }
 }

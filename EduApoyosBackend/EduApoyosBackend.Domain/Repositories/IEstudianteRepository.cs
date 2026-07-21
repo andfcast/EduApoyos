@@ -9,5 +9,6 @@ namespace EduApoyosBackend.Domain.Repositories
 {
     public interface IEstudianteRepository : IGenericRepository<Estudiante>
     {
+        Task<bool> ExisteUsuarioPorNumDocumentoAsync(int tipoDocumento, string numDocumento);
     }
 }

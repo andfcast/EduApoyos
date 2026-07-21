@@ -12,7 +12,7 @@ using System.Text;
 
 namespace EduApoyosBackend.API
 {
-    public class Program
+    public partial class Program
     {
         public static void Main(string[] args)
         {
@@ -85,5 +85,5 @@ namespace EduApoyosBackend.API
 
             app.Run();
         }
-    }
+    }    
 }

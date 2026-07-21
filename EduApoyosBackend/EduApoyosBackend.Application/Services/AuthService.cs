@@ -30,7 +30,7 @@ namespace EduApoyosBackend.Application.Services
             var usuario = await _unitOfWork.Usuarios.ObtenerPorCorreoAsync(dto.Email);
             if (usuario == null || !_passwordHasher.Verify(dto.Password, usuario.PasswordHash))
             {
-                throw new Exception("Credenciales inválidas."); // Evita dar pistas de si el correo existe o no
+                throw new UnauthorizedAccessException("Credenciales inválidas."); // Evita dar pistas de si el correo existe o no
             }
 
             // 3. Generar el Token (JWT u otro mecanismo de sesión)
@@ -52,24 +52,22 @@ namespace EduApoyosBackend.Application.Services
             {
                 throw new InvalidOperationException("El correo electrónico ya está en uso.");
             }
+            var existeEstudiante = await _unitOfWork.Estudiantes.ExisteUsuarioPorNumDocumentoAsync(dto.TipoDocumentoId, dto.NumeroDocumento);
+            if (existeEstudiante)
+            {
+                throw new InvalidOperationException("El número de documento ya está en uso.");
+            }
 
-            // 2. Mapear y encriptar la entidad Base (User) de Domain
-            var nuevoUsuario = new Usuario
-            (Guid.NewGuid(), dto.NombreCompleto, dto.Email, _passwordHasher.Hash(dto.Password), 2, DateTime.UtcNow);
+            var nuevoUsuario = new Usuario(Guid.NewGuid(), dto.NombreCompleto, dto.Email, _passwordHasher.Hash(dto.Password), 2, DateTime.UtcNow);
 
-            // Agregamos al repositorio específico de usuarios
             await _unitOfWork.Usuarios.AgregarAsync(nuevoUsuario);
 
-            // Guardamos aquí para que EF genere el nuevoUsuario.Id de forma segura
             await _unitOfWork.SaveChangesAsync();
 
-            // 3. Mapear la entidad Extendida (Estudiante) usando el ID recién creado
             var nuevoEstudiante = new Estudiante(Guid.NewGuid(), nuevoUsuario.Id, dto.TipoDocumentoId, dto.NumeroDocumento, dto.ProgramaAcademico, dto.Semestre);
 
-            // Agregamos al repositorio específico de estudiantes
             await _unitOfWork.Estudiantes.AgregarAsync(nuevoEstudiante);
 
-            // Consolidamos la transacción atómica final en la base de datos
             await _unitOfWork.SaveChangesAsync();
 
             return "Estudiante registrado con éxito de manera segura.";
