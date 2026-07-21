@@ -1,0 +1,47 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header class="login-header">
+      <mat-card-title>EduApoyos</mat-card-title>
+      <mat-card-subtitle>Iniciar Sesión</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="login-content">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Correo Electrónico</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="usuario@edu.co" />
+          <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+            El correo electrónico es obligatorio.
+          </mat-error>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+            Ingresa un formato de correo válido.
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input matInput type="password" formControlName="password" />
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+            La contraseña es obligatoria.
+          </mat-error>
+        </mat-form-field>
+
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit" 
+          class="full-width submit-btn" 
+          [disabled]="isLoading">
+          <span *ngIf="!isLoading">Ingresar</span>
+          <mat-spinner *ngIf="isLoading" diameter="24"></mat-spinner>
+        </button>
+
+      </form>
+    </mat-card-content>
+
+    <mat-card-footer class="login-footer">
+      <p>¿No tienes cuenta? <a routerLink="/nuevo-usuario">Regístrate como estudiante</a></p>
+    </mat-card-footer>
+  </mat-card>
+</div>
