@@ -8,3 +8,10 @@ export interface AuthResponseDto {
   email: string;
   nombre: string;
 }
+
+export interface SesionUsuario {
+  nombre: string;
+  email: string;
+  rol: 'Asesor' | 'Estudiante';
+  token: string;
+}

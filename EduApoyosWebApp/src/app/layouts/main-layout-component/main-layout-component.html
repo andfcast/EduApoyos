@@ -1,0 +1,73 @@
+<mat-sidenav-container class="sidenav-container">
+  <!-- Menú Lateral Dinámico -->
+  <mat-sidenav mode="side" opened class="sidenav">
+    <div class="brand">
+      <mat-icon color="primary">school</mat-icon>
+      <h2>EduApoyos</h2>
+    </div>
+
+    <mat-nav-list>
+      @if (authService.userRole() === 'Asesor') {
+        <a mat-list-item routerLink="/dashboard/asesor" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>dashboard</mat-icon>
+          <span matListItemTitle>Panel Asesor</span>
+        </a>
+        <a mat-list-item routerLink="/dashboard/solicitudes" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>assignment</mat-icon>
+          <span matListItemTitle>Gestión de Solicitudes</span>
+        </a>
+        <a mat-list-item routerLink="/dashboard/estudiantes-lista" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>people</mat-icon>
+          <span matListItemTitle>Listado Estudiantes</span>
+        </a>
+      }
+
+      @if (authService.userRole() === 'Estudiante') {
+        <a mat-list-item routerLink="/dashboard/estudiante" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>home</mat-icon>
+          <span matListItemTitle>Mi Panel</span>
+        </a>
+        <a mat-list-item routerLink="/dashboard/mis-solicitudes" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>history</mat-icon>
+          <span matListItemTitle>Mis Solicitudes</span>
+        </a>
+        <a mat-list-item routerLink="/dashboard/nueva-solicitud" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>add_circle</mat-icon>
+          <span matListItemTitle>Solicitar Apoyo</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <!-- Contenido Principal -->
+  <mat-sidenav-content>
+    <!-- Topbar Header -->
+    <mat-toolbar color="primary" class="topbar">
+      <span class="spacer"></span>
+
+      <!-- Bloque del usuario en la esquina superior derecha -->
+      @if (authService.currentUser(); as user) {
+        <div class="user-profile-box" [matMenuTriggerFor]="userMenu">
+          <mat-icon class="user-icon">account_circle</mat-icon>
+          <div class="user-info">
+            <span class="user-name">{{ user.nombre }}</span>
+            <span class="user-role">{{ user.rol }}</span>
+          </div>
+          <mat-icon>expand_more</mat-icon>
+        </div>
+
+        <mat-menu #userMenu="matMenu" xPosition="before">
+          <button mat-menu-item (click)="onLogout()">
+            <mat-icon color="warn">exit_to_app</mat-icon>
+            <span>Cerrar Sesión</span>
+          </button>
+        </mat-menu>
+      }
+    </mat-toolbar>
+
+    <!-- Vista secundaria donde se cargan las pantallas del rol -->
+    <main class="content-area">
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

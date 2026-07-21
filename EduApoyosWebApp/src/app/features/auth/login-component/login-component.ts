@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component,inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -12,16 +12,17 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { AuthService } from '../../../core/services/auth.service';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-login-component',
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     RouterLink,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
+    MatIconModule,
     MatButtonModule,
     MatSnackBarModule,
     MatProgressSpinnerModule
@@ -35,12 +36,18 @@ export class LoginComponent {
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
 
+  // Signals de estado
+  isLoading = signal<boolean>(false);
+  hidePassword = signal<boolean>(true);
+
   loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]]
+    password: ['', [Validators.required]]
   });
 
-  isLoading = false;
+  togglePasswordVisibility(): void {
+    this.hidePassword.update((visible) => !visible);
+  }
 
   onSubmit(): void {
     if (this.loginForm.invalid) {
@@ -48,22 +55,18 @@ export class LoginComponent {
       return;
     }
 
-    this.isLoading = true;
+    this.isLoading.set(true);
 
     this.authService.login(this.loginForm.value).subscribe({
-      next: (res) => {
-        this.isLoading = false;
-        this.snackBar.open(`¡Bienvenido/a, ${res.nombre}!`, 'Cerrar', { duration: 3000 });
-        this.router.navigate(['/dashboard']); // Redirigir según la navegación deseada
+      next: (userSession) => {
+        this.isLoading.set(false);
+        this.snackBar.open(`¡Bienvenido, ${userSession.nombre}!`, 'Cerrar', { duration: 3000 });
+        // AuthService realiza el ruteo dinámico según el rol (Asesor o Estudiante)
       },
       error: (err) => {
-        this.isLoading = false;
-        // Capturar mensaje del backend (Unauthorized 401 u otros)
-        const errorMessage = err.error?.message || 'Credenciales incorrectas o error en el servidor.';
-        this.snackBar.open(errorMessage, 'Aceptar', {
-          duration: 4000,
-          panelClass: ['error-snackbar']
-        });
+        this.isLoading.set(false);
+        const errorMsg = err.error?.message || err.error?.title || 'Credenciales inválidas o error en el servidor.';
+        this.snackBar.open(errorMsg, 'Cerrar', { duration: 4000 });
       }
     });
   }

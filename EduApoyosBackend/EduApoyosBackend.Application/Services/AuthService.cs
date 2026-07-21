@@ -45,32 +45,20 @@ namespace EduApoyosBackend.Application.Services
             };
         }
 
-        public async Task<string> RegistrarEstudianteAsync(RegistroUsuarioDto dto)
+        public async Task<string> RegistrarUsuarioAsync(RegistroUsuarioDto dto)
         {
             var existeUsuario = await _unitOfWork.Usuarios.ObtenerPorCorreoAsync(dto.Email);
             if (existeUsuario != null)
             {
                 throw new InvalidOperationException("El correo electrónico ya está en uso.");
-            }
-            var existeEstudiante = await _unitOfWork.Estudiantes.ExisteUsuarioPorNumDocumentoAsync(dto.TipoDocumentoId, dto.NumeroDocumento);
-            if (existeEstudiante)
-            {
-                throw new InvalidOperationException("El número de documento ya está en uso.");
-            }
-
-            var nuevoUsuario = new Usuario(Guid.NewGuid(), dto.NombreCompleto, dto.Email, _passwordHasher.Hash(dto.Password), 2, DateTime.UtcNow);
+            }            
+            var nuevoUsuario = new Usuario(Guid.NewGuid(), dto.NombreCompleto, dto.Email, _passwordHasher.Hash(dto.Password), dto.RolId, DateTime.UtcNow);
 
             await _unitOfWork.Usuarios.AgregarAsync(nuevoUsuario);
 
-            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();            
 
-            var nuevoEstudiante = new Estudiante(Guid.NewGuid(), nuevoUsuario.Id, dto.TipoDocumentoId, dto.NumeroDocumento, dto.ProgramaAcademico, dto.Semestre);
-
-            await _unitOfWork.Estudiantes.AgregarAsync(nuevoEstudiante);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            return "Estudiante registrado con éxito de manera segura.";
+            return "Usuario registrado con éxito de manera segura.";
         }
     }
 }

@@ -2,46 +2,68 @@
   <mat-card class="login-card">
     <mat-card-header class="login-header">
       <mat-card-title>EduApoyos</mat-card-title>
-      <mat-card-subtitle>Iniciar Sesión</mat-card-subtitle>
+      <mat-card-subtitle>Ingresa tus credenciales para acceder</mat-card-subtitle>
     </mat-card-header>
 
     <mat-card-content class="login-content">
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         
+        <!-- Correo Electrónico -->
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Correo Electrónico</mat-label>
-          <input matInput type="email" formControlName="email" placeholder="usuario@edu.co" />
-          <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
-            El correo electrónico es obligatorio.
-          </mat-error>
-          <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
-            Ingresa un formato de correo válido.
-          </mat-error>
+          <input 
+            matInput 
+            type="email" 
+            formControlName="email" 
+            placeholder="ejemplo@eduapoyos.co" />
+          @if (loginForm.get('email')?.hasError('required')) {
+            <mat-error>El correo es obligatorio.</mat-error>
+          }
+          @if (loginForm.get('email')?.hasError('email')) {
+            <mat-error>Ingresa un correo electrónico válido.</mat-error>
+          }
         </mat-form-field>
 
+        <!-- Contraseña -->
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Contraseña</mat-label>
-          <input matInput type="password" formControlName="password" />
-          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
-            La contraseña es obligatoria.
-          </mat-error>
+          <input 
+            matInput 
+            [type]="hidePassword() ? 'password' : 'text'" 
+            formControlName="password" />
+          <button 
+            mat-icon-button 
+            matSuffix 
+            type="button"
+            (click)="togglePasswordVisibility()" 
+            [attr.aria-label]="'Ocultar contraseña'" 
+            [attr.aria-pressed]="hidePassword()">
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (loginForm.get('password')?.hasError('required')) {
+            <mat-error>La contraseña es obligatoria.</mat-error>
+          }
         </mat-form-field>
 
+        <!-- Botón de Envío -->
         <button 
           mat-raised-button 
           color="primary" 
           type="submit" 
           class="full-width submit-btn" 
-          [disabled]="isLoading">
-          <span *ngIf="!isLoading">Ingresar</span>
-          <mat-spinner *ngIf="isLoading" diameter="24"></mat-spinner>
+          [disabled]="isLoading()">
+          @if (!isLoading()) {
+            <span>Iniciar Sesión</span>
+          } @else {
+            <mat-spinner diameter="24"></mat-spinner>
+          }
         </button>
 
       </form>
     </mat-card-content>
 
     <mat-card-footer class="login-footer">
-      <p>¿No tienes cuenta? <a routerLink="/nuevo-usuario">Regístrate como estudiante</a></p>
+      <p>¿No tienes una cuenta? <a routerLink="/registro">Regístrate aquí</a></p>
     </mat-card-footer>
   </mat-card>
 </div>

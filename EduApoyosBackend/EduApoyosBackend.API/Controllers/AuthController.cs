@@ -36,8 +36,8 @@ namespace EduApoyosBackend.API.Controllers
         public async Task<IActionResult> Register([FromBody] RegistroUsuarioDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            _logger.LogInformation("Intentando registrar un nuevo estudiante con correo: {Email}", dto.Email);
-            var resultado = await _authService.RegistrarEstudianteAsync(dto);
+            _logger.LogInformation("Intentando registrar un nuevo usuario con correo: {Email}", dto.Email);
+            var resultado = await _authService.RegistrarUsuarioAsync(dto);
             return Ok();
         }
     }

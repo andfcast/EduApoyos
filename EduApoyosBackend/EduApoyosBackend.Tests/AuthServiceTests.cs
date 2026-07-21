@@ -16,7 +16,6 @@ namespace EduApoyosBackend.Tests
         private readonly Mock<IPasswordHasher> _hasherMock;
         private readonly Mock<ITokenService> _jwtProviderMock;
         private readonly Mock<IUsuarioRepository> _usuarioRepoMock;
-        private readonly Mock<IEstudianteRepository> _estudianteRepoMock;
 
         private readonly AuthService _authService;
 
@@ -26,17 +25,15 @@ namespace EduApoyosBackend.Tests
             _hasherMock = new Mock<IPasswordHasher>();
             _jwtProviderMock = new Mock<ITokenService>();
             _usuarioRepoMock = new Mock<IUsuarioRepository>();
-            _estudianteRepoMock = new Mock<IEstudianteRepository>();
 
             // Configuramos el Unit of Work para que devuelva nuestros repositorios mockeados
             _uowMock.Setup(u => u.Usuarios).Returns(_usuarioRepoMock.Object);
-            _uowMock.Setup(u => u.Estudiantes).Returns(_estudianteRepoMock.Object);
 
             _authService = new AuthService(_uowMock.Object, _hasherMock.Object, _jwtProviderMock.Object);
         }
 
         [Fact]
-        public async Task RegisterEstudianteAsync_DeberiaRegistrarExitosamente_CuandoCorreoNoExiste()
+        public async Task RegisterUsuarioAsync_DeberiaRegistrarExitosamente_CuandoCorreoNoExiste()
         {
             // Arrange
             var dto = new RegistroUsuarioDto
@@ -44,10 +41,7 @@ namespace EduApoyosBackend.Tests
                 NombreCompleto = "Ana Gómez",
                 Email = "ana.gomez@edu.co",
                 Password = "Password123*",
-                TipoDocumentoId = 1,
-                NumeroDocumento = "123456789",
-                ProgramaAcademico = "Ingeniería",
-                Semestre = 3
+                RolId = 2
             };
 
             // Simulamos que el correo NO existe previamente
@@ -55,19 +49,18 @@ namespace EduApoyosBackend.Tests
             _hasherMock.Setup(h => h.Hash(dto.Password)).Returns("hashed_password");
 
             // Act
-            var resultado = await _authService.RegistrarEstudianteAsync(dto);
+            var resultado = await _authService.RegistrarUsuarioAsync(dto);
 
             // Assert
-            resultado.Should().Be("Estudiante registrado con éxito de manera segura.");
+            resultado.Should().Be("Usuario registrado con éxito de manera segura.");
 
-            // Verificamos que se guardaron los cambios dos veces (usuario y estudiante)
-            _uowMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Exactly(2));
+            // Verificamos que se guardaron los cambios una vez
+            _uowMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
             _usuarioRepoMock.Verify(r => r.AgregarAsync(It.IsAny<Usuario>()), Times.Once);
-            _estudianteRepoMock.Verify(r => r.AgregarAsync(It.IsAny<Estudiante>()), Times.Once);
         }
 
         [Fact]
-        public async Task RegisterEstudianteAsync_DeberiaLanzarExcepcion_CuandoCorreoYaExiste()
+        public async Task RegisterUsuarioAsync_DeberiaLanzarExcepcion_CuandoCorreoYaExiste()
         {
             // Arrange
             var dto = new RegistroUsuarioDto { Email = "existente@edu.co" };
@@ -77,7 +70,7 @@ namespace EduApoyosBackend.Tests
             _usuarioRepoMock.Setup(r => r.ObtenerPorCorreoAsync(dto.Email)).ReturnsAsync(usuarioExistente);
 
             // Act & Assert
-            var accion = async () => await _authService.RegistrarEstudianteAsync(dto);
+            var accion = async () => await _authService.RegistrarUsuarioAsync(dto);
 
             await accion.Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("El correo electrónico ya está en uso.");
@@ -85,27 +78,7 @@ namespace EduApoyosBackend.Tests
             // Verificamos que NUNCA se intentó guardar nada
             _uowMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
-
-        [Fact]
-        public async Task RegisterEstudianteAsync_DeberiaLanzarExcepcion_CuandoEstudianteYaExiste()
-        {
-            // Arrange
-            var dto = new RegistroUsuarioDto { Email = "existente@edu.co", TipoDocumentoId = 1, NumeroDocumento = "987654321" };
-            var estudianteExistente = new Estudiante(Guid.NewGuid(),Guid.NewGuid(), dto.TipoDocumentoId, dto.NumeroDocumento, "Ingeniería", 3);
-
-            // Simulamos que el correo YA existe
-            _estudianteRepoMock.Setup(r => r.ExisteUsuarioPorNumDocumentoAsync(dto.TipoDocumentoId, dto.NumeroDocumento)).ReturnsAsync(true);
-
-            // Act & Assert
-            var accion = async () => await _authService.RegistrarEstudianteAsync(dto);
-
-            await accion.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("El número de documento ya está en uso.");
-
-            // Verificamos que NUNCA se intentó guardar nada
-            _uowMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
-        }
-
+        
         [Fact]
         public async Task LoginAsync_DeberiaRetornarToken_CuandoCredencialesSonCorrectas()
         {

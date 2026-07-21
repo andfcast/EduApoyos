@@ -94,10 +94,9 @@ namespace EduApoyosBackend.Tests
 
             // 3. Assert: Validamos que la respuesta sea exitosa (200 OK) y retorne el token
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            // Opcional: Si tu DTO de respuesta contiene un token, puedes deserializarlo para validarlo
-            // var resultado = await response.Content.ReadFromJsonAsync<AuthResponseDto>();
-            // resultado.Token.Should().NotBeNullOrEmpty();
+        
+            var resultado = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
+            resultado.Token.Should().NotBeNullOrEmpty();
         }
     }
 }

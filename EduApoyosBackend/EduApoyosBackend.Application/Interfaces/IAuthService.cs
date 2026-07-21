@@ -10,6 +10,6 @@ namespace EduApoyosBackend.Application.Interfaces
     public interface IAuthService
     {
         Task<LoginResponseDto> LoginAsync(LoginDto dto);
-        Task<string> RegistrarEstudianteAsync(RegistroUsuarioDto dto);
+        Task<string> RegistrarUsuarioAsync(RegistroUsuarioDto dto);
     }
 }
