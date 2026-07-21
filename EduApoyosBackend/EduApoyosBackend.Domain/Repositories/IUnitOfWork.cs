@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EduApoyosBackend.Domain.Repositories
 {
-    public interface IUnitOfWork : IDisposable
+    public interface IUnitOfWork
     {
         IUsuarioRepository Usuarios { get; }
         IRolRepository Roles { get; }
@@ -16,6 +16,6 @@ namespace EduApoyosBackend.Domain.Repositories
         IEstudianteRepository Estudiantes { get; }
         ISolicitudApoyoRepository Solicitudes { get; }
         IHistorialEstadoRepository HistorialEstados { get; }
-        Task<int> SaveChangesAsync();
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

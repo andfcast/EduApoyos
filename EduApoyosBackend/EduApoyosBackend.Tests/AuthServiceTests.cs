@@ -61,7 +61,7 @@ namespace EduApoyosBackend.Tests
             resultado.Should().Be("Estudiante registrado con éxito de manera segura.");
 
             // Verificamos que se guardaron los cambios dos veces (usuario y estudiante)
-            _uowMock.Verify(u => u.SaveChangesAsync(), Times.Exactly(2));
+            _uowMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Exactly(2));
             _usuarioRepoMock.Verify(r => r.AgregarAsync(It.IsAny<Usuario>()), Times.Once);
             _estudianteRepoMock.Verify(r => r.AgregarAsync(It.IsAny<Estudiante>()), Times.Once);
         }
@@ -83,7 +83,7 @@ namespace EduApoyosBackend.Tests
                 .WithMessage("El correo electrónico ya está en uso.");
 
             // Verificamos que NUNCA se intentó guardar nada
-            _uowMock.Verify(u => u.SaveChangesAsync(), Times.Never);
+            _uowMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -103,7 +103,7 @@ namespace EduApoyosBackend.Tests
                 .WithMessage("El número de documento ya está en uso.");
 
             // Verificamos que NUNCA se intentó guardar nada
-            _uowMock.Verify(u => u.SaveChangesAsync(), Times.Never);
+            _uowMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
