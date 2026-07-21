@@ -9,11 +9,13 @@ namespace EduApoyosBackend.Application.DTOs
 {
     public class EstudianteDto
     {
-        public Guid UsuarioId { get; private set; }        
-        public int TipoDocumentoId { get; private set; }        
-        public string NumeroDocumento { get; private set; } = string.Empty;
-        public string ProgramaAcademico { get; private set; } = string.Empty;
-        public int Semestre { get; private set; }
+        public Guid UsuarioId { get; set; }        
+        public string TipoDocumento { get; set; }  = string.Empty;      
+        public string NumeroDocumento { get; set; } = string.Empty;
+        public string NombreCompleto { get; set; } = string.Empty;
+        public string Correo { get; set; } = string.Empty;
+        public string ProgramaAcademico { get; set; } = string.Empty;
+        public int Semestre { get; set; }
         public bool Activo { get; set; } = true;
     }
 }

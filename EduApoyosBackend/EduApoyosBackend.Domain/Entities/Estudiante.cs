@@ -9,16 +9,16 @@ namespace EduApoyosBackend.Domain.Entities
 {
     public class Estudiante : BaseEntity<Guid>
     {
-        public Guid UsuarioId { get; private set; }
-        public Usuario Usuario { get; private set; } = null!;
-        public int TipoDocumentoId { get; private set; }
-        public TipoDocumento TipoDocumento { get; private set; } = null!;
-        public string NumeroDocumento { get; private set; }
-        public int ProgramaAcademicoId { get; private set; }
-        public ProgramaAcademico ProgramaAcademico { get; private set; }
-        public int Semestre { get; private set; }
+        public Guid UsuarioId { get; set; }
+        public Usuario Usuario { get; set; } = null!;
+        public int TipoDocumentoId { get;  set; }
+        public TipoDocumento TipoDocumento { get;  set; } = null!;
+        public string NumeroDocumento { get;  set; }
+        public int ProgramaAcademicoId { get; set; }
+        public ProgramaAcademico ProgramaAcademico { get; set; } = null!;
+        public int Semestre { get; set; }
         public bool Activo { get; set; } = true;
-        public ICollection<SolicitudApoyo> Solicitudes { get; private set; } = new List<SolicitudApoyo>();
+        public ICollection<SolicitudApoyo> Solicitudes { get; set; } = new List<SolicitudApoyo>();
 
         public Estudiante(Guid id, Guid usuarioId, int tipoDocumentoId, string numeroDocumento, int programaAcademicoId, int semestre)
         {

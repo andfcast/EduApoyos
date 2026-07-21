@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace EduApoyosBackend.Application.Services
 {
-    public class EstudianteService: IEstudianteService
+    public class EstudianteService : IEstudianteService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordHasher _passwordHasher;
@@ -25,6 +25,23 @@ namespace EduApoyosBackend.Application.Services
             _passwordHasher = passwordHasher;
             _tokenService = tokenService;
         }
+
+        public async Task<IEnumerable<EstudianteDto>> ObtenerEstudiantesAsync()
+        {
+            var estudiantes = await _unitOfWork.Estudiantes.ListarAsync();
+            return estudiantes.Select(e => new EstudianteDto
+            {
+                UsuarioId = e.UsuarioId,
+                TipoDocumento = e.TipoDocumento.Descripcion,
+                NumeroDocumento = e.NumeroDocumento,
+                NombreCompleto = e.Usuario.NombreCompleto,
+                Correo = e.Usuario.Email,
+                ProgramaAcademico = e.ProgramaAcademico.Descripcion,
+                Semestre = e.Semestre,
+                Activo = e.Activo
+            });
+        }
+
         public async Task<string> RegistrarEstudianteAsync(RegistroEstudianteDto dto)
         {
             var existeUsuario = await _unitOfWork.Usuarios.ObtenerPorCorreoAsync(dto.Email);
@@ -51,6 +68,39 @@ namespace EduApoyosBackend.Application.Services
             await _unitOfWork.SaveChangesAsync();
 
             return "Estudiante registrado con éxito de manera segura.";
+        }
+
+        public async Task<string> ActualizarEstudianteAsync(RegistroEstudianteDto dto)
+        {
+            var estudiante = await _unitOfWork.Estudiantes.ObtenerPorGuidAsync(dto.Id);
+            if (estudiante == null)
+            {
+                throw new InvalidOperationException("El estudiante no fue encontrado.");
+            }
+
+            // Actualizar los datos del estudiante
+            estudiante.TipoDocumentoId = dto.TipoDocumentoId;
+            estudiante.NumeroDocumento = dto.NumeroDocumento;
+            estudiante.ProgramaAcademicoId = dto.ProgramaAcademicoId;
+            estudiante.Semestre = dto.Semestre;
+            estudiante.Activo = dto.Activo;
+
+            var usuarioExistente = await _unitOfWork.Usuarios.ObtenerPorGuidAsync(estudiante.UsuarioId);
+            if (usuarioExistente != null)
+            {
+                usuarioExistente.NombreCompleto = dto.NombreCompleto;
+                usuarioExistente.Email = dto.Email;
+                if (!string.IsNullOrWhiteSpace(dto.Password))
+                {
+                    usuarioExistente.PasswordHash = _passwordHasher.Hash(dto.Password);
+                }
+                _unitOfWork.Usuarios.Actualizar(usuarioExistente);
+            }
+            
+            _unitOfWork.Estudiantes.Actualizar(estudiante);
+            await _unitOfWork.SaveChangesAsync();
+
+            return "Estudiante actualizado con éxito.";
         }
     }
 }

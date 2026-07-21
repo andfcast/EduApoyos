@@ -9,6 +9,7 @@ namespace EduApoyosBackend.Application.DTOs
 {
     public class RegistroEstudianteDto
     {
+        public Guid Id { get; set; }
         [Required(ErrorMessage = "El nombre completo es obligatorio.")]
         [StringLength(150, ErrorMessage = "El nombre no puede superar los 150 caracteres.")]
         public string NombreCompleto { get; set; } = string.Empty;
@@ -37,5 +38,7 @@ namespace EduApoyosBackend.Application.DTOs
         [Required(ErrorMessage = "El semestre es obligatorio.")]
         [Range(1, 12, ErrorMessage = "El semestre debe estar en un rango de 1 a 12.")]
         public int Semestre { get; set; }
+
+        public bool Activo { get; set; } = true;
     }
 }

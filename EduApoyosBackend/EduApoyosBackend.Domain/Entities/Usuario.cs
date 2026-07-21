@@ -10,12 +10,12 @@ namespace EduApoyosBackend.Domain.Entities
 {
     public class Usuario : BaseEntity<Guid>
     {
-        public string NombreCompleto { get; private set; }
-        public string Email { get; private set; }
-        public string PasswordHash { get; private set; }
-        public int RolId { get; private set; }
+        public string NombreCompleto { get; set; }
+        public string Email { get; set; }
+        public string PasswordHash { get; set; }
+        public int RolId { get; set; }
         public Rol Rol { get; set; } = null!;
-        public DateTime FechaRegistro { get; private set; }
+        public DateTime FechaRegistro { get; set; }
 
         public Usuario(Guid id, string nombreCompleto, string email, string passwordHash, int rolId, DateTime fechaRegistro)
         {

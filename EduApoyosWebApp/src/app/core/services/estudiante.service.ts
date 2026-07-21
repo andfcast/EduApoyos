@@ -10,7 +10,7 @@ import { environment } from '../../../environments/environment';
 })
 export class EstudianteService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/estudiantes`;
+  private apiUrl = `${environment.apiUrl}estudiantes`;
 
 
   obtenerPorId(id: number): Observable<Estudiante> {

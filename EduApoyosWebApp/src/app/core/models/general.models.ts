@@ -3,3 +3,8 @@ export interface TipoDocumento {
   codigo: string;
   nombre: string;
 }
+
+export interface ProgramaAcademico {
+  id: number;  
+  nombre: string;
+}

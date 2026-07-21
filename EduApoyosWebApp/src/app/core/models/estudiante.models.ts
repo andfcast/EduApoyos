@@ -8,6 +8,7 @@ export interface Estudiante {
 }
 
 export interface RegistroEstudiante {  
+  id?: string;
   nombreCompleto: string;
   email: string;
   password:string;
