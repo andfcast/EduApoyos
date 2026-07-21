@@ -12,6 +12,8 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Context
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Rol> Roles { get; set; }
         public DbSet<TipoDocumento> TiposDocumento { get; set; }
+
+        public DbSet<ProgramaAcademico> ProgramasAcademicos { get; set; }
         public DbSet<TipoApoyo> TiposApoyo { get; set; }
         public DbSet<EstadoSolicitud> EstadosSolicitud { get; set; }
         public DbSet<Estudiante> Estudiantes { get; set; }
@@ -42,6 +44,15 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Context
                 );
             });
 
+            modelBuilder.Entity<ProgramaAcademico>(b => {
+                b.ToTable("ProgramasAcademicos").HasKey(p => p.Id); b.Property(p => p.Id).ValueGeneratedNever();
+                b.HasData(
+                    new ProgramaAcademico(1, "Ingeniería de Sistemas"),
+                    new ProgramaAcademico(2, "Medicina"),
+                    new ProgramaAcademico(3, "Derecho")
+                );
+            });
+
             modelBuilder.Entity<EstadoSolicitud>(b => {
                 b.ToTable("EstadosSolicitud").HasKey(e => e.Id); b.Property(e => e.Id).ValueGeneratedNever();
                 b.HasData(new EstadoSolicitud(1, "Pendiente", "Radicada"), new EstadoSolicitud(2, "En Revisión", "Validando"), new EstadoSolicitud(3, "Aprobada", "Aceptada"), new EstadoSolicitud(4, "Rechazada", "No cumple requisitos"));
@@ -57,6 +68,7 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Context
                 b.Property(e => e.Activo).HasDefaultValue(true);
                 b.HasOne(e => e.Usuario).WithOne().HasForeignKey<Estudiante>(e => e.UsuarioId).OnDelete(DeleteBehavior.Cascade);
                 b.HasOne(e => e.TipoDocumento).WithMany().HasForeignKey(e => e.TipoDocumentoId).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(e => e.ProgramaAcademico).WithMany().HasForeignKey(e => e.ProgramaAcademicoId).OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<SolicitudApoyo>(b => {

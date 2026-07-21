@@ -14,5 +14,6 @@ export interface RegistroEstudiante {
   tipoDocumentoId:number;
   numeroDocumento: string;    
   programaAcademico:string;
-  semestre:number;    
+  semestre:number; 
+  activo: boolean;   
 }

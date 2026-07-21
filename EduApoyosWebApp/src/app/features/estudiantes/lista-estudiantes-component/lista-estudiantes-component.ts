@@ -59,18 +59,18 @@ export class ListaEstudiantesComponent {
 
   cargarEstudiantes(): void {
     this.isLoading.set(true);
-    // this.estudiantesService.obtenerTodos().subscribe({
-    //   next: (estudiantes) => {
-    //     this.dataSource.data = estudiantes;
-    //     this.dataSource.paginator = this.paginator;
-    //     this.dataSource.sort = this.sort;
-    //     this.isLoading.set(false);
-    //   },
-    //   error: () => {
-    //     this.snackBar.open('Error al obtener estudiantes', 'Cerrar', { duration: 3000 });
-    //     this.isLoading.set(false);
-    //   }
-    // });
+    this.estudiantesService.obtenerTodos().subscribe({
+      next: (estudiantes) => {
+        this.dataSource.data = estudiantes;
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.snackBar.open('Error al obtener estudiantes', 'Cerrar', { duration: 3000 });
+        this.isLoading.set(false);
+      }
+    });
   }
 
   aplicarFiltro(event: Event): void {
@@ -106,18 +106,18 @@ export class ListaEstudiantesComponent {
 
     dialogRef.afterClosed().subscribe((estudianteEditado) => {
       if (estudianteEditado) {
-        // this.estudiantesService.actualizar(estudiante.id, estudianteEditado).subscribe({
-        //   next: () => {
-        //     this.snackBar.open('Estudiante actualizado exitosamente', 'Cerrar', { duration: 3000 });
-        //     this.cargarEstudiantes();
-        //   },
-        //   error: () => this.snackBar.open('Error al actualizar estudiante', 'Cerrar', { duration: 3000 })
-        // });
+        this.estudiantesService.actualizar(estudianteEditado).subscribe({
+          next: () => {
+            this.snackBar.open('Estudiante actualizado exitosamente', 'Cerrar', { duration: 3000 });
+            this.cargarEstudiantes();
+          },
+          error: () => this.snackBar.open('Error al actualizar estudiante', 'Cerrar', { duration: 3000 })
+        });
       }
     });
   }
 
-  eliminarEstudiante(estudiante: Estudiante): void {
+  // eliminarEstudiante(estudiante: Estudiante): void {
     // if (confirm(`¿Inactivar/Eliminar al estudiante ${estudiante.nombreCompleto}?`)) {
     //   this.estudiantesService.eliminar(estudiante.id).subscribe({
     //     next: () => {
@@ -127,5 +127,5 @@ export class ListaEstudiantesComponent {
     //     error: () => this.snackBar.open('Error al eliminar estudiante', 'Cerrar', { duration: 3000 })
     //   });
     // }
-  }
+  // }
 }

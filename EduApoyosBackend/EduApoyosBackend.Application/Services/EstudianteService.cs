@@ -44,7 +44,7 @@ namespace EduApoyosBackend.Application.Services
 
             await _unitOfWork.SaveChangesAsync();
 
-            var nuevoEstudiante = new Estudiante(Guid.NewGuid(), nuevoUsuario.Id, dto.TipoDocumentoId, dto.NumeroDocumento, dto.ProgramaAcademico, dto.Semestre);
+            var nuevoEstudiante = new Estudiante(Guid.NewGuid(), nuevoUsuario.Id, dto.TipoDocumentoId, dto.NumeroDocumento, dto.ProgramaAcademicoId, dto.Semestre);
 
             await _unitOfWork.Estudiantes.AgregarAsync(nuevoEstudiante);
 

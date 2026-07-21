@@ -39,7 +39,8 @@ export class EstudianteFormDialogComponent {
       nombreCompleto: [data?.nombreCompleto || '', [Validators.required, Validators.minLength(3)]],
       correo: [data?.email || '', [Validators.required, Validators.email]],      
       programaAcademico: [data?.programaAcademico || '', [Validators.required]],
-      semestre: [data?.semestre || 1, [Validators.required, Validators.min(1), Validators.max(12)]],      
+      semestre: [data?.semestre || 1, [Validators.required, Validators.min(1), Validators.max(12)]],
+      activo: [data?.activo ?? true, null]      
     });
   }
 

@@ -1,61 +1,120 @@
-<h2 mat-dialog-title>{{ isEditMode ? 'Editar Estudiante' : 'Registrar Nuevo Estudiante' }}</h2>
+<div class="dialog-header">
+  <h2 mat-dialog-title>
+    <mat-icon color="primary">{{ isEditMode ? 'edit' : 'person_add' }}</mat-icon>
+    {{ isEditMode ? 'Editar Estudiante' : 'Registrar Nuevo Estudiante' }}
+  </h2>
+  <p class="dialog-subtitle">
+    {{ isEditMode ? 'Modifica los datos del estudiante en el sistema.' : 'Ingresa la información requerida para dar de alta al estudiante.' }}
+  </p>
+</div>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="form" class="form-grid">
     
-    <mat-dialog-content class="dialog-content">
-      <form [formGroup]="form" class="form-grid">
-        
-        <mat-form-field appearance="outline">
-          <mat-label>Tipo Documento</mat-label>
-          <mat-select formControlName="tipoDocumento">
-            <mat-option value="CC">Cédula de Ciudadanía</mat-option>
-            <mat-option value="TI">Tarjeta de Identidad</mat-option>
-            <mat-option value="CE">Cédula de Extranjería</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Número Documento</mat-label>
-          <input matInput formControlName="numeroDocumento" placeholder="1012345678">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Nombre Completo</mat-label>
-          <input matInput formControlName="nombreCompleto" placeholder="Ej: Juan Pérez">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Correo Electrónico</mat-label>
-          <input matInput type="email" formControlName="correo" placeholder="estudiante@correo.edu.co">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Teléfono</mat-label>
-          <input matInput formControlName="telefono" placeholder="3001234567">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Programa Académico</mat-label>
-          <input matInput formControlName="programaAcademico" placeholder="Ingeniería de Sistemas">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Semestre</mat-label>
-          <input matInput type="number" formControlName="semestre" min="1" max="12">
-        </mat-form-field>
-
-        @if (isEditMode) {
-          <div class="toggle-container full-width">
-            <mat-slide-toggle formControlName="activo" color="primary">
-              Estudiante Activo
-            </mat-slide-toggle>
-          </div>
+    <!-- Tipo de Documento -->
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo de Documento</mat-label>
+      <mat-select formControlName="tipoDocumento">
+        @for (tipo of tiposDocumento(); track tipo.id) {
+          <mat-option [value]="tipo.codigo">{{ tipo.nombre }}</mat-option>
         }
+      </mat-select>
+      @if (form.get('tipoDocumento')?.hasError('required')) {
+        <mat-error>El tipo de documento es obligatorio</mat-error>
+      }
+    </mat-form-field>
 
-      </form>
-    </mat-dialog-content>
+    <!-- Número de Documento -->
+    <mat-form-field appearance="outline">
+      <mat-label>Número de Documento</mat-label>
+      <input matInput formControlName="numeroDocumento" placeholder="Ej: 1012345678">
+      @if (form.get('numeroDocumento')?.hasError('required')) {
+        <mat-error>El número de documento es obligatorio</mat-error>
+      } @else if (form.get('numeroDocumento')?.hasError('pattern')) {
+        <mat-error>Ingrese solo números</mat-error>
+      }
+    </mat-form-field>
 
-    <mat-dialog-actions align="end">
-      <button mat-button (click)="dialogRef.close(false)">Cancelar</button>
-      <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="guardar()">
-        {{ isEditMode ? 'Actualizar' : 'Guardar' }}
+    <!-- Nombre Completo -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nombre Completo</mat-label>
+      <input matInput formControlName="nombreCompleto" placeholder="Ej: Juan Pablo Pérez">
+      <mat-icon matSuffix>person</mat-icon>
+      @if (form.get('nombreCompleto')?.hasError('required')) {
+        <mat-error>El nombre completo es obligatorio</mat-error>
+      } @else if (form.get('nombreCompleto')?.hasError('minlength')) {
+        <mat-error>Mínimo 3 caracteres</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Correo Electrónico -->
+    <mat-form-field appearance="outline">
+      <mat-label>Correo Electrónico</mat-label>
+      <input matInput type="email" formControlName="correo" placeholder="estudiante@institucion.edu.co">
+      <mat-icon matSuffix>email</mat-icon>
+      @if (form.get('correo')?.hasError('required')) {
+        <mat-error>El correo es obligatorio</mat-error>
+      } @else if (form.get('correo')?.hasError('email')) {
+        <mat-error>Formato de correo inválido</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Contraseña (Reemplaza al Teléfono) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Contraseña</mat-label>
+      <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" placeholder="Mínimo 6 caracteres">
+      <button mat-icon-button matSuffix (click)="togglePasswordVisibility()" type="button" [attr.aria-label]="'Ocultar contraseña'" [attr.aria-pressed]="hidePassword()">
+        <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
       </button>
-    </mat-dialog-actions>
+      @if (form.get('password')?.hasError('required')) {
+        <mat-error>La contraseña es obligatoria</mat-error>
+      } @else if (form.get('password')?.hasError('minlength')) {
+        <mat-error>Mínimo 6 caracteres</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Programa Académico -->
+    <mat-form-field appearance="outline">
+      <mat-label>Programa Académico</mat-label>
+      <mat-select formControlName="programaAcademico">
+        @for (prog of programasAcademicos(); track prog.id) {
+          <mat-option [value]="prog.nombre">{{ prog.nombre }}</mat-option>
+        }
+      </mat-select>
+      @if (form.get('programaAcademico')?.hasError('required')) {
+        <mat-error>Seleccione un programa académico</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Semestre -->
+    <mat-form-field appearance="outline">
+      <mat-label>Semestre</mat-label>
+      <mat-select formControlName="semestre">
+        @for (sem of [1,2,3,4,5,6,7,8,9,10]; track sem) {
+          <mat-option [value]="sem">Semestre {{ sem }}</mat-option>
+        }
+      </mat-select>
+      @if (form.get('semestre')?.hasError('required')) {
+        <mat-error>El semestre es obligatorio</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Estado Activo (Sólo en modo edición) -->
+    @if (isEditMode) {
+      <div class="toggle-container full-width">
+        <mat-slide-toggle formControlName="activo" color="primary">
+          Estudiante Activo en el Sistema
+        </mat-slide-toggle>
+      </div>
+    }
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="dialogRef.close(false)">Cancelar</button>
+  <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="guardar()">
+    <mat-icon>save</mat-icon>
+    {{ isEditMode ? 'Actualizar' : 'Registrar' }}
+  </button>
+</mat-dialog-actions>

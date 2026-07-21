@@ -31,8 +31,8 @@ namespace EduApoyosBackend.Application.DTOs
         public string NumeroDocumento { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El programa académico es obligatorio.")]
-        [StringLength(100, ErrorMessage = "El programa académico no puede superar los 100 caracteres.")]
-        public string ProgramaAcademico { get; set; } = string.Empty;
+        [Range(1, int.MaxValue, ErrorMessage = "Seleccione un programa académico válido.")]
+        public int ProgramaAcademicoId { get; set; }
 
         [Required(ErrorMessage = "El semestre es obligatorio.")]
         [Range(1, 12, ErrorMessage = "El semestre debe estar en un rango de 1 a 12.")]

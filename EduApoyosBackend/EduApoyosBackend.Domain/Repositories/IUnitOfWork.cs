@@ -11,6 +11,7 @@ namespace EduApoyosBackend.Domain.Repositories
         IUsuarioRepository Usuarios { get; }
         IRolRepository Roles { get; }
         ITipoDocumentoRepository TiposDocumento { get; }
+        IProgramaAcademicoRepository ProgramasAcademicos { get; }
         ITipoApoyoRepository TiposApoyo { get; }
         IEstadoSolicitudRepository EstadosSolicitud { get; }
         IEstudianteRepository Estudiantes { get; }

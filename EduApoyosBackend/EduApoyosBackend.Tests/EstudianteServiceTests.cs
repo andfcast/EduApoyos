@@ -49,7 +49,7 @@ namespace EduApoyosBackend.Tests
                 Password = "Password123*",
                 TipoDocumentoId = 1,
                 NumeroDocumento = "123456789",
-                ProgramaAcademico = "Ingeniería",
+                ProgramaAcademicoId = 1,
                 Semestre = 3
             };
 
@@ -94,7 +94,7 @@ namespace EduApoyosBackend.Tests
         {
             // Arrange
             var dto = new RegistroEstudianteDto { Email = "existente@edu.co", TipoDocumentoId = 1, NumeroDocumento = "987654321" };
-            var estudianteExistente = new Estudiante(Guid.NewGuid(), Guid.NewGuid(), dto.TipoDocumentoId, dto.NumeroDocumento, "Ingeniería", 3);
+            var estudianteExistente = new Estudiante(Guid.NewGuid(), Guid.NewGuid(), dto.TipoDocumentoId, dto.NumeroDocumento, 1, 3);
 
             // Simulamos que el correo YA existe
             _estudianteRepoMock.Setup(r => r.ExisteUsuarioPorNumDocumentoAsync(dto.TipoDocumentoId, dto.NumeroDocumento)).ReturnsAsync(true);

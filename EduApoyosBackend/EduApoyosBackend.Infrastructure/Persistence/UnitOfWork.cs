@@ -24,6 +24,9 @@ namespace EduApoyosBackend.Infrastructure.Persistence
         private ITipoDocumentoRepository? _tiposDocumento;
         public ITipoDocumentoRepository TiposDocumento => _tiposDocumento ??= new Repositories.TipoDocumentoRepository(_context);
 
+        private IProgramaAcademicoRepository? _programasAcademicos;
+        public IProgramaAcademicoRepository ProgramasAcademicos => _programasAcademicos ??= new Repositories.ProgramaAcademicoRepository(_context);
+
         private ITipoApoyoRepository? _tiposApoyo;
         public ITipoApoyoRepository TiposApoyo => _tiposApoyo ??= new Repositories.TipoApoyoRepository(_context);
 
