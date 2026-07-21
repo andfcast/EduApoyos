@@ -1,0 +1,92 @@
+<div class="register-container">
+  <mat-card class="register-card">
+    <mat-card-header class="register-header">
+      <mat-card-title>Registro de Usuario</mat-card-title>
+      <mat-card-subtitle>Crea tu cuenta de acceso a la plataforma</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="register-content">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+        <!-- Nombre Completo -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nombre Completo</mat-label>
+          <input matInput formControlName="nombreCompleto" placeholder="Ej. Ana María Torres" />
+          @if (registerForm.get('nombreCompleto')?.hasError('required')) {
+            <mat-error>El nombre completo es obligatorio.</mat-error>
+          }
+          @if (registerForm.get('nombreCompleto')?.hasError('minlength')) {
+            <mat-error>Mínimo 3 caracteres.</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Correo Electrónico -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Correo Electrónico</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="usuario@eduapoyos.co" />
+          @if (registerForm.get('email')?.hasError('required')) {
+            <mat-error>El correo es obligatorio.</mat-error>
+          }
+          @if (registerForm.get('email')?.hasError('email')) {
+            <mat-error>Ingresa un formato de correo válido.</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Contraseña -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" />
+          <button 
+            mat-icon-button 
+            matSuffix 
+            type="button"
+            (click)="togglePasswordVisibility()" 
+            [attr.aria-label]="'Ocultar contraseña'" 
+            [attr.aria-pressed]="hidePassword()">
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (registerForm.get('password')?.hasError('required')) {
+            <mat-error>La contraseña es obligatoria.</mat-error>
+          }
+          @if (registerForm.get('password')?.hasError('pattern')) {
+            <mat-error>Mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 carácter especial.</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Rol del Usuario -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Rol / Perfil</mat-label>
+          <mat-select formControlName="rolId">
+            @for (rol of roles(); track rol.id) {
+              <mat-option [value]="rol.id">
+                {{ rol.nombre }}
+              </mat-option>
+            }
+          </mat-select>
+          @if (registerForm.get('rolId')?.hasError('required')) {
+            <mat-error>Selecciona el perfil de acceso.</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Botón de Envío -->
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit" 
+          class="full-width submit-btn"
+          [disabled]="isLoading()">
+          @if (!isLoading()) {
+            <span>Crear Cuenta</span>
+          } @else {
+            <mat-spinner diameter="24"></mat-spinner>
+          }
+        </button>
+
+      </form>
+    </mat-card-content>
+
+    <mat-card-footer class="register-footer">
+      <p>¿Ya tienes una cuenta? <a routerLink="/login">Iniciar Sesión</a></p>
+    </mat-card-footer>
+  </mat-card>
+</div>

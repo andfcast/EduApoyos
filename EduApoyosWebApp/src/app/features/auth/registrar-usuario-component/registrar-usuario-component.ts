@@ -1,72 +1,72 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component,OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
-// Material Imports
+// Angular Material Imports
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { UsuarioService } from '../../../core/services/usuario.service';
-import { TipoDocumentoService } from '../../../core/services/tipo-documento.service';
-import { TipoDocumento } from '../../../core/models/general.models';
+import { RolService } from '../../../core/services/rol.service';
+import { Rol } from '../../../core/models/usuario.models';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-nuevo-usuario-component',
-  standalone: true,
-  imports: [
-    CommonModule,
+  selector: 'app-registrar-usuario-component',
+  imports: [    
     ReactiveFormsModule,
     RouterLink,
     MatCardModule,
+    MatIconModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
     MatSelectModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatButtonModule,
+    MatSnackBarModule,
+    MatProgressSpinnerModule
   ],
-  templateUrl: './nuevo-usuario-component.html',
-  styleUrls: ['./nuevo-usuario-component.css'],
+  templateUrl: './registrar-usuario-component.html',
+  styleUrl: './registrar-usuario-component.css',
 })
-export class NuevoUsuarioComponent implements OnInit {
+export class RegistrarUsuarioComponent implements OnInit {
   private fb = inject(FormBuilder);
   private usuarioService = inject(UsuarioService);
-  private tipoDocumentoService = inject(TipoDocumentoService);
+  private rolService = inject(RolService);
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
 
-  tiposDocumento = signal<TipoDocumento[]>([]);
+  roles = signal<Rol[]>([]);
   isLoading = signal<boolean>(false);
+  hidePassword = signal<boolean>(true);
 
-  // Expresión regular para contraseña segura (Alineada a la regla del backend)
-  // Al menos: 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 carácter especial
+  // Mismo patrón de contraseña requerido por el backend
   private passwordPattern = '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&._-]).{8,}$';
 
   registerForm: FormGroup = this.fb.group({
     nombreCompleto: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.pattern(this.passwordPattern)]],
-    tipoDocumentoId: ['', [Validators.required]],
-    numeroDocumento: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
-    programaAcademico: ['', [Validators.required]],
-    semestre: ['', [Validators.required, Validators.min(1), Validators.max(12)]]
+    rolId: ['', [Validators.required]]
   });
 
   ngOnInit(): void {
-    this.cargarTiposDocumento();
+    this.cargarRoles();
   }
 
-  private cargarTiposDocumento(): void {
-    this.tipoDocumentoService.obtenerTodos().subscribe({
-      next: (tipos) => this.tiposDocumento.set(tipos),
+  togglePasswordVisibility(): void {
+    this.hidePassword.update((visible) => !visible);
+  }
+
+  private cargarRoles(): void {
+    this.rolService.obtenerTodos().subscribe({
+      next: (listaRoles) => this.roles.set(listaRoles),
       error: () => {
-        this.snackBar.open('Error al cargar la lista de tipos de documento.', 'Cerrar', { duration: 4000 });
+        this.snackBar.open('Error al cargar la lista de roles desde el servidor.', 'Cerrar', { duration: 4000 });
       }
     });
   }
@@ -82,7 +82,7 @@ export class NuevoUsuarioComponent implements OnInit {
     this.usuarioService.registrar(this.registerForm.value).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.snackBar.open('Estudiante registrado con éxito. Ya puedes iniciar sesión.', 'Ok', { duration: 4000 });
+        this.snackBar.open('Usuario creado con éxito. Ya puedes iniciar sesión.', 'Ok', { duration: 4000 });
         this.router.navigate(['/login']);
       },
       error: (err) => {

@@ -12,11 +12,13 @@ namespace EduApoyosBackend.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly IUsuarioService _usuarioService;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IAuthService authService, ILogger<AuthController> logger)
+        public AuthController(IAuthService authService, IUsuarioService usuarioService, ILogger<AuthController> logger)
         {
             _authService = authService;
+            _usuarioService = usuarioService;
             _logger = logger;
         }
         [AllowAnonymous]
@@ -36,8 +38,8 @@ namespace EduApoyosBackend.API.Controllers
         public async Task<IActionResult> Register([FromBody] RegistroUsuarioDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            _logger.LogInformation("Intentando registrar un nuevo estudiante con correo: {Email}", dto.Email);
-            var resultado = await _authService.RegistrarEstudianteAsync(dto);
+            _logger.LogInformation("Intentando registrar un nuevo usuario con correo: {Email}", dto.Email);
+            var resultado = await _usuarioService.RegistrarUsuarioAsync(dto);
             return Ok();
         }
     }

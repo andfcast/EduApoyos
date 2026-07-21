@@ -1,0 +1,38 @@
+<div class="dashboard-container">
+  <h2>Bienvenido, {{ authService.currentUser()?.nombre }} 👋</h2>
+  <p class="subtitle">Panel de Control para Asesores Educativos</p>
+
+  <div class="metrics-grid">
+    <!-- Card Estudiantes -->
+    <mat-card class="metric-card primary">
+      <mat-card-header>
+        <mat-icon class="card-icon">people</mat-icon>
+        <mat-card-title>Gestión de Estudiantes</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Registra, consulta y actualiza la información académica de los estudiantes.</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-flat-button color="primary" routerLink="/dashboard/estudiantes">
+          Ir a Estudiantes
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Card Solicitudes / Apoyos -->
+    <mat-card class="metric-card accent">
+      <mat-card-header>
+        <mat-icon class="card-icon">assignment</mat-icon>
+        <mat-card-title>Solicitudes de Apoyo</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Revisa y aprueba las solicitudes registradas por los estudiantes.</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-stroked-button color="accent">
+          Ver Solicitudes
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

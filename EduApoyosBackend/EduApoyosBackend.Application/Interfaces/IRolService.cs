@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EduApoyosBackend.Application.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,6 @@ namespace EduApoyosBackend.Application.Interfaces
 {
     public interface IRolService
     {
+        Task<IEnumerable<RolDto>> ObtenerRolesActivosAsync();
     }
 }

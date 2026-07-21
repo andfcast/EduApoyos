@@ -35,16 +35,15 @@ namespace EduApoyosBackend.API.Middlewares
 
             var statusCode = HttpStatusCode.InternalServerError; // Por defecto 500
             var message = "Ocurrió un error interno en el servidor.";
-
-            // Mapeamos excepciones conocidas a códigos de estado HTTP específicos
+            
             switch (exception)
             {
-                case InvalidOperationException: // Ej: Correo ya registrado
+                case InvalidOperationException:
                     statusCode = HttpStatusCode.BadRequest;
                     message = exception.Message;
                     break;
 
-                case UnauthorizedAccessException: // Ej: Credenciales incorrectas en el login
+                case UnauthorizedAccessException:
                     statusCode = HttpStatusCode.Unauthorized;
                     message = exception.Message;
                     break;

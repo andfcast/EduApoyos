@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EduApoyosBackend.Application.DTOs;
+using EduApoyosBackend.Application.Interfaces;
+using EduApoyosBackend.Application.Services;
+using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,24 +11,38 @@ namespace EduApoyosBackend.API.Controllers
     [ApiController]
     public class EstudiantesController : ControllerBase
     {
-        // GET: api/<EstudiantesController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly IEstudianteService _service;
+        private readonly ILogger<EstudiantesController> _logger;
+
+        public EstudiantesController(IEstudianteService service, ILogger<EstudiantesController> logger)
         {
-            return new string[] { "value1", "value2" };
+            _service = service;
+            _logger = logger;
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<EstudianteDto>))]
+        public async Task<IActionResult> Get()
+        {
+            var result = await _service.ObtenerEstudiantesAsync();
+            return Ok(result);
         }
 
         // GET api/<EstudiantesController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public string Get(Guid id)
         {
             return "value";
         }
 
         // POST api/<EstudiantesController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] RegistroEstudianteDto dto)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            _logger.LogInformation("Intentando registrar un nuevo estudiante con correo: {Email}", dto.Email);
+            var resultado = await _service.RegistrarEstudianteAsync(dto);
+            return Ok();
         }
 
         // GET api/<EstudiantesController>/5

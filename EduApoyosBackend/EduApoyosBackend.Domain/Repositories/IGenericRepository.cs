@@ -11,6 +11,7 @@ namespace EduApoyosBackend.Domain.Repositories
     {
         // Operaciones de Lectura Asíncronas
         Task<T?> ObtenerPorIdAsync(int id);
+        Task<T?> ObtenerPorGuidAsync(Guid id);
         Task<IEnumerable<T>> ListarAsync();
 
         // Consultas personalizadas usando expresiones Lambda (se evalúan en diferido)

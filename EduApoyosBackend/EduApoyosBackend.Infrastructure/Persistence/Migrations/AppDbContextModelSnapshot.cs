@@ -72,13 +72,17 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("Activo")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
                     b.Property<string>("NumeroDocumento")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProgramaAcademico")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ProgramaAcademicoId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Semestre")
                         .HasColumnType("int");
@@ -90,6 +94,8 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProgramaAcademicoId");
 
                     b.HasIndex("TipoDocumentoId");
 
@@ -136,6 +142,37 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
                     b.HasIndex("UsuarioId");
 
                     b.ToTable("HistorialesEstados", (string)null);
+                });
+
+            modelBuilder.Entity("EduApoyosBackend.Domain.Entities.ProgramaAcademico", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProgramasAcademicos", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Descripcion = "Ingeniería de Sistemas"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Descripcion = "Medicina"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Descripcion = "Derecho"
+                        });
                 });
 
             modelBuilder.Entity("EduApoyosBackend.Domain.Entities.Rol", b =>
@@ -315,6 +352,12 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("EduApoyosBackend.Domain.Entities.Estudiante", b =>
                 {
+                    b.HasOne("EduApoyosBackend.Domain.Entities.ProgramaAcademico", "ProgramaAcademico")
+                        .WithMany()
+                        .HasForeignKey("ProgramaAcademicoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("EduApoyosBackend.Domain.Entities.TipoDocumento", "TipoDocumento")
                         .WithMany()
                         .HasForeignKey("TipoDocumentoId")
@@ -326,6 +369,8 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
                         .HasForeignKey("EduApoyosBackend.Domain.Entities.Estudiante", "UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ProgramaAcademico");
 
                     b.Navigation("TipoDocumento");
 

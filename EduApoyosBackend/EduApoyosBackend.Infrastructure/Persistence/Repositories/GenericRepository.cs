@@ -51,5 +51,10 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Repositories
             // Remueve la entidad del tracking y la marca para eliminación física en BD.
             _context.Set<T>().Remove(entity);
         }
+
+        public async Task<T?> ObtenerPorGuidAsync(Guid guid)
+        {
+            return await _context.Set<T>().FindAsync(guid);
+        }
     }
 }

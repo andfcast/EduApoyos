@@ -1,0 +1,52 @@
+<div class="layout-container">
+  <!-- Barra de navegación superior -->
+  <mat-toolbar color="primary" class="main-toolbar">
+    <button mat-icon-button (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span class="app-title">EduApoyos</span>
+    <span class="spacer"></span>
+    
+    <div class="user-info">
+      <span class="user-name">{{ authService.currentUser()?.nombre }}</span>
+      <span class="user-role">({{ authService.currentUser()?.rol }})</span>
+    </div>
+
+    <button mat-icon-button (click)="logout()" title="Cerrar Sesión">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <!-- Contenedor Lateral y Principal -->
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav #sidenav mode="side" opened class="main-sidenav">
+      <mat-nav-list>
+        <!-- Opciones dinámicas o generales -->
+        @if (authService.userRole() === 'Asesor') {
+          <a mat-list-item routerLink="/dashboard/asesor">
+            <mat-icon matListItemIcon>dashboard</mat-icon>
+            <span matListItemTitle>Panel Asesor</span>
+          </a>
+          <a mat-list-item routerLink="/dashboard/estudiantes">
+            <mat-icon matListItemIcon>people</mat-icon>
+            <span matListItemTitle>Gestión Estudiantes</span>
+          </a>
+        } @else if (authService.userRole() === 'Estudiante') {
+          <a mat-list-item routerLink="/dashboard/estudiante">
+            <mat-icon matListItemIcon>person</mat-icon>
+            <span matListItemTitle>Mi Perfil</span>
+          </a>
+          <a mat-list-item routerLink="/solicitudes">
+            <mat-icon matListItemIcon>description</mat-icon>
+            <span matListItemTitle>Mis Solicitudes</span>
+          </a>
+        }
+      </mat-nav-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content class="main-content">
+      <!-- Aquí se renderiza la vista activa del Dashboard -->
+      <router-outlet></router-outlet>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>
