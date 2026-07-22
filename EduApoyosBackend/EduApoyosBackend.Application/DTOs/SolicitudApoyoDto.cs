@@ -17,5 +17,6 @@ namespace EduApoyosBackend.Application.DTOs
         public DateTime FechaSolicitud { get; set; }
         public DateTime FechaActualizacion { get; set; }
         public string NombreAsesor { get; set; } = string.Empty;
+        public List<HistorialEstadoDto> HistorialEstados { get; set; } = new List<HistorialEstadoDto>();
     }
 }

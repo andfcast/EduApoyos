@@ -13,6 +13,7 @@ namespace EduApoyosBackend.Domain.Entities
         public Estudiante Estudiante { get; private set; } = null!;
         public int TipoApoyoId { get; private set; }
         public TipoApoyo TipoApoyo { get; private set; } = null!;
+        public double MontoSolicitado { get; set; }
         public string Descripcion { get; private set; }
         public int EstadoSolicitudId { get; private set; }
         public Guid AsesorId { get; private set; }
