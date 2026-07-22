@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace EduApoyosBackend.Domain.Repositories
 {
     public interface IGenericRepository<T> where T : class
-    {
+    {        
         // Operaciones de Lectura Asíncronas
         Task<T?> ObtenerPorIdAsync(int id);
         Task<T?> ObtenerPorGuidAsync(Guid id);
@@ -16,6 +16,8 @@ namespace EduApoyosBackend.Domain.Repositories
 
         // Consultas personalizadas usando expresiones Lambda (se evalúan en diferido)
         IEnumerable<T> Buscar(Expression<Func<T, bool>> expression);
+
+        Task<IEnumerable<T>> BuscarAsync(Expression<Func<T, bool>> predicado);
 
         // Operaciones de Escritura
         Task AgregarAsync(T entity);

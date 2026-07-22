@@ -5,21 +5,22 @@
 <mat-dialog-content class="dialog-content">
   <form [formGroup]="form" class="solicitud-form">
 
-    <!-- Combo Estudiantes -->
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Estudiante</mat-label>
-      <mat-select formControlName="estudianteId" placeholder="Seleccione el estudiante">
-        @for (est of estudiantes(); track est.id) {
-          <mat-option [value]="est.id">
-            {{ est.nombreCompleto }} 
-          </mat-option>
+    @if(authService.esAsesor()) {
+      <!-- Combo Estudiantes (sólo aparece para asesores)-->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Estudiante</mat-label>
+        <mat-select formControlName="estudianteId" placeholder="Seleccione el estudiante">
+          @for (est of estudiantes(); track est.id) {
+            <mat-option [value]="est.id">
+              {{ est.nombreCompleto }} 
+            </mat-option>
+          }
+        </mat-select>
+        @if (form.get('estudianteId')?.hasError('required')) {
+          <mat-error>Debe seleccionar un estudiante</mat-error>
         }
-      </mat-select>
-      @if (form.get('estudianteId')?.hasError('required')) {
-        <mat-error>Debe seleccionar un estudiante</mat-error>
-      }
-    </mat-form-field>
-
+      </mat-form-field>        
+    }
     <!-- Combo Tipo de Apoyo -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Tipo de Apoyo</mat-label>

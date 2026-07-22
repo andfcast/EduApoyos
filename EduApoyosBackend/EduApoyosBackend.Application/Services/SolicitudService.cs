@@ -2,6 +2,7 @@
 using EduApoyosBackend.Application.Interfaces;
 using EduApoyosBackend.Domain.Entities;
 using EduApoyosBackend.Domain.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,15 @@ namespace EduApoyosBackend.Application.Services
                 NombreEstudiante = t.Estudiante.Usuario.NombreCompleto,
                 NombreAsesor = t.Asesor.NombreCompleto,
                 FechaActualizacion = t.FechaActualizacion,
+                HistorialEstados = t.HistorialEstados.Select(h => new HistorialEstadoDto
+                {
+                    Id = h.Id,
+                    SolicitudId = h.SolicitudId,
+                    EstadoAnterior = h.EstadoAnteriorId == 0 ? string.Empty : h.EstadoAnterior.Nombre,
+                    EstadoSiguiente = h.EstadoNuevo.Nombre,
+                    FechaCambio = h.FechaCambio,
+                    Observacion = h.Observacion
+                }).ToList()
             });
         }
 
@@ -58,7 +68,7 @@ namespace EduApoyosBackend.Application.Services
                     SolicitudId = h.SolicitudId,
                     EstadoAnterior = h.EstadoAnteriorId == 0 ? string.Empty : h.EstadoAnterior.Nombre,
                     EstadoSiguiente = h.EstadoNuevo.Nombre,
-                    FechaCambio = h.FechaCambio,                    
+                    FechaCambio = h.FechaCambio,
                     Observacion = h.Observacion
                 }).ToList()
             };
@@ -70,6 +80,7 @@ namespace EduApoyosBackend.Application.Services
                 Guid.NewGuid(),
                 dto.EstudianteId,
                 dto.TipoApoyoId,
+                dto.MontoSolicitado,
                 dto.Descripcion,
                 1, // Estado inicial: Pendiente
                 DateTime.UtcNow,
@@ -96,6 +107,51 @@ namespace EduApoyosBackend.Application.Services
             await _unitOfWork.HistorialEstados.AgregarAsync(new HistorialEstado(Guid.NewGuid(), solicitudId, estadoAnterior, nuevoEstadoId, DateTime.UtcNow, dto.UsuarioId, $"Cambio de estado de {estadoAnterior} a {nuevoEstadoId}"));
             await _unitOfWork.SaveChangesAsync();
             return "Estado de la solicitud actualizado con éxito.";
+        }
+
+        public async Task<IEnumerable<SolicitudApoyoDto>> ObtenerSolicitudesXEstudianteAsync(Guid id)
+        {
+            var estudiante = (await _unitOfWork.Estudiantes.BuscarAsync(x => x.UsuarioId == id)).FirstOrDefault();
+            if (estudiante == null)
+                return Enumerable.Empty<SolicitudApoyoDto>();
+
+            var estudianteId = estudiante.Id;
+            // Construir la consulta y cargar explícitamente las relaciones necesarias con Include
+            var query = _unitOfWork.Solicitudes
+                .Buscar(x => x.EstudianteId == estudianteId)
+                .AsQueryable();
+
+            var solicitudes = await query
+                .Include(s => s.EstadoSolicitud)
+                .Include(s => s.TipoApoyo)
+                .Include(s => s.Estudiante).ThenInclude(e => e.Usuario)
+                .Include(s => s.Asesor)
+                .Include(s => s.HistorialEstados).ThenInclude(h => h.EstadoAnterior)
+                .Include(s => s.HistorialEstados).ThenInclude(h => h.EstadoNuevo)
+                .ToListAsync();
+
+            // Mapear con comprobaciones nulas para evitar NullReferenceException si faltan Includes o datos
+            return solicitudes.Select(solicitud => new SolicitudApoyoDto
+            {
+                Id = solicitud.Id,
+                Descripcion = solicitud.Descripcion,
+                Estado = solicitud.EstadoSolicitud?.Nombre ?? "Pendiente",
+                FechaSolicitud = solicitud.FechaSolicitud,
+                MontoSolicitado = solicitud.MontoSolicitado,
+                TipoApoyo = solicitud.TipoApoyo?.Nombre ?? string.Empty,
+                NombreEstudiante = solicitud.Estudiante?.Usuario?.NombreCompleto ?? string.Empty,
+                NombreAsesor = solicitud.Asesor?.NombreCompleto ?? string.Empty,
+                FechaActualizacion = solicitud.FechaActualizacion,
+                HistorialEstados = solicitud.HistorialEstados?.Select(h => new HistorialEstadoDto
+                {
+                    Id = h.Id,
+                    SolicitudId = h.SolicitudId,
+                    EstadoAnterior = h.EstadoAnteriorId == 0 ? string.Empty : h.EstadoAnterior?.Nombre ?? string.Empty,
+                    EstadoSiguiente = h.EstadoNuevo?.Nombre ?? string.Empty,
+                    FechaCambio = h.FechaCambio,
+                    Observacion = h.Observacion
+                }).ToList() ?? new List<HistorialEstadoDto>()
+            });
         }
     }
 }
