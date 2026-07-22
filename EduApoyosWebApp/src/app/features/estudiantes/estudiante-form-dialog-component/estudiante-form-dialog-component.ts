@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { RegistroEstudiante } from '../../../core/models/estudiante.models';
 import { ProgramaAcademico, TipoDocumento } from '../../../core/models/general.models';
 import { MatIconModule } from '@angular/material/icon';
-import { CatalogoService } from '../../../core/services/tipo-documento.service';
+import { CatalogoService } from '../../../core/services/catalogo.service';
 
 @Component({
   selector: 'app-estudiante-form-dialog-component',

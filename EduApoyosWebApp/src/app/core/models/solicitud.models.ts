@@ -6,9 +6,11 @@ export interface Solicitud {
     descripcion: string;
     estado: string;
     fechaSolicitud: Date;
+    fechaActualizacion: Date;
     nombreAsesor: string;
+    historialEstados: HistorialEstadoSolicitud[];
 }
-
+ 
 export interface RegistroSolicitud {
     id:string;
     estudianteId: string;
@@ -18,4 +20,13 @@ export interface RegistroSolicitud {
     estadoId: string;
     fechaSolicitud: Date;
     asesorId: string;
+}
+
+export interface HistorialEstadoSolicitud {
+    id: string;
+    solicitudId: string;
+    estadoAnterior: string;
+    estadoNuevo: string;
+    fechaCambio: Date;
+    observacion: string;
 }
