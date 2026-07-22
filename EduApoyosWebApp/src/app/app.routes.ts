@@ -42,6 +42,11 @@ export const routes: Routes = [
         path: 'estudiante',
         canActivate: [roleGuard('Estudiante')],
         loadComponent: () => import('./features/dashboard/estudiante-dashboard-component/estudiante-dashboard-component').then(m => m.EstudianteDashboardComponent)
+      },
+      {
+        path: 'mis-solicitudes',
+        canActivate: [roleGuard('Estudiante')],
+        loadComponent: () => import('./features/solicitudes/lista-solicitudes-component/lista-solicitudes-component').then(m => m.ListaSolicitudesComponent)
       },    
     ]
   },

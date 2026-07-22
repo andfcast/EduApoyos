@@ -13,7 +13,7 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        protected readonly AppDbContext _context;
+        protected readonly AppDbContext _context;  
 
         public GenericRepository(AppDbContext context)
         {
@@ -50,6 +50,13 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Repositories
             return _context.Set<T>().Where(expression);
         }
 
+        public async Task<IEnumerable<T>> BuscarAsync(Expression<Func<T, bool>> predicado)
+        {
+            return await _context.Set<T>().AsNoTracking()
+                               .Where(predicado)
+                               .ToListAsync();
+        }
+
         public async Task AgregarAsync(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
@@ -71,6 +78,6 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Repositories
         public async Task<T?> ObtenerPorGuidAsync(Guid guid)
         {
             return await _context.Set<T>().FindAsync(guid);
-        }
+        }        
     }
 }

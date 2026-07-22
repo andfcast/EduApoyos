@@ -31,7 +31,7 @@ export class SolicitudFormDialogComponent implements OnInit {
   private fb = inject(FormBuilder);
   private catalogosService = inject(CatalogoService);
   private estudiantesService = inject(EstudianteService);
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
   dialogRef = inject(MatDialogRef<SolicitudFormDialogComponent>);
 
   form!: FormGroup;
@@ -46,28 +46,31 @@ export class SolicitudFormDialogComponent implements OnInit {
   }
 
   private initForm(): void {    
-    const asesorId = this.authService.getUserId();
+    const asesorId = this.authService.esAsesor() ? this.authService.getUserId() : '';
+    const estudianteId = this.authService.esEstudiante() ? this.authService.getUserId() : '';
 
     this.form = this.fb.group({
       id: [crypto.randomUUID()],
-      estudianteId: ['', [Validators.required]],
+      estudianteId: [estudianteId, [Validators.required]],
       tipoApoyoId: ['', [Validators.required]],
       montoSolicitado: [0, [Validators.required, Validators.min(1)]],
       descripcion: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(1000)]],
       estadoId: [1],
-      asesorId: [asesorId, [Validators.required]]
+      asesorId: [asesorId]
     });
   }
 
   private cargarCombos(): void {
     // Cargar Estudiantes
-    this.estudiantesService.obtenerTodosCombo().subscribe({
-      next: (list) => this.estudiantes.set(list),
-      error: (err) => console.error('Error cargando estudiantes', err)
-    });
+    if(this.authService.esAsesor()) {
+      this.estudiantesService.obtenerTodosCombo().subscribe({
+        next: (list) => this.estudiantes.set(list),
+        error: (err) => console.error('Error cargando estudiantes', err)
+      });
+    }
 
     // Cargar Tipos de Apoyo
-    this.catalogosService.obtenerTiposApoyo     ().subscribe({
+    this.catalogosService.obtenerTiposApoyo().subscribe({
       next: (list) => this.tiposApoyo.set(list),
       error: (err) => console.error('Error cargando tipos de apoyo', err)
     });

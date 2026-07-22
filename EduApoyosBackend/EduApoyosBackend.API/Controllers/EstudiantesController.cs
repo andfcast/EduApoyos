@@ -12,11 +12,13 @@ namespace EduApoyosBackend.API.Controllers
     public class EstudiantesController : ControllerBase
     {
         private readonly IEstudianteService _service;
+        private readonly ISolicitudService _solicitudService;
         private readonly ILogger<EstudiantesController> _logger;
 
-        public EstudiantesController(IEstudianteService service, ILogger<EstudiantesController> logger)
+        public EstudiantesController(IEstudianteService service, ISolicitudService solicitudService, ILogger<EstudiantesController> logger)
         {
             _service = service;
+            _solicitudService = solicitudService;
             _logger = logger;
         }
 
@@ -27,14 +29,7 @@ namespace EduApoyosBackend.API.Controllers
             var result = await _service.ObtenerEstudiantesAsync();
             return Ok(result);
         }
-
-        // GET api/<EstudiantesController>/5
-        [HttpGet("{id}")]
-        public string Get(Guid id)
-        {
-            return "value";
-        }
-
+        
         // POST api/<EstudiantesController>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] RegistroEstudianteDto dto)
@@ -55,11 +50,12 @@ namespace EduApoyosBackend.API.Controllers
             return Ok();
         }
 
-        // GET api/<EstudiantesController>/5
-        [HttpGet("{id}/solicitudes")]
-        public string GetSolicitudes(int id)
+        // GET api/<EstudiantesController>/id/solicitudes
+        [HttpGet("{id:guid}/solicitudes")]
+        public async Task<IActionResult> GetSolicitudes(Guid id)
         {
-            return "value";
+            var resultado = await _solicitudService.ObtenerSolicitudesXEstudianteAsync(id);
+            return Ok(resultado);
         }
     }
 }

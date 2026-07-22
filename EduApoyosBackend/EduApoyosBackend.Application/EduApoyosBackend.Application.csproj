@@ -11,6 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.29" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\EduApoyosBackend.Domain\EduApoyosBackend.Domain.csproj" />
   </ItemGroup>
 

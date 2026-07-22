@@ -23,10 +23,12 @@ namespace EduApoyosBackend.Domain.Entities
         public DateTime FechaActualizacion { get; private set; }
         public ICollection<HistorialEstado> HistorialEstados { get; private set; } = new List<HistorialEstado>();
 
-        public SolicitudApoyo(Guid id, Guid estudianteId, int tipoApoyoId, string descripcion, int estadoSolicitudId, DateTime fechaSolicitud, DateTime fechaActualizacion, Guid asesorId)
+        private SolicitudApoyo() { }
+        public SolicitudApoyo(Guid id, Guid estudianteId, int tipoApoyoId, double monto, string descripcion, int estadoSolicitudId, DateTime fechaSolicitud, DateTime fechaActualizacion, Guid asesorId)
         {
             Id = id; EstudianteId = estudianteId; 
             TipoApoyoId = tipoApoyoId; 
+            MontoSolicitado = monto;
             Descripcion = descripcion; 
             EstadoSolicitudId = estadoSolicitudId; 
             FechaSolicitud = fechaSolicitud; 

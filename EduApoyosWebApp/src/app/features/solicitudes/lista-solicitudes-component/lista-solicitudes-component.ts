@@ -15,6 +15,7 @@ import { SolicitudesService } from '../../../core/services/solicitud.service';
 import { SolicitudFormDialogComponent } from '../solicitud-form-dialog-component/solicitud-form-dialog-component';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { DetalleSolicitudDialogComponent } from '../detalle-solicitud-dialog-component/detalle-solicitud-dialog-component';
+import { EstudianteService } from '../../../core/services/estudiante.service';
 
 @Component({
   selector: 'app-lista-solicitudes-component',
@@ -38,6 +39,7 @@ export class ListaSolicitudesComponent implements OnInit{
 
 
   private solicitudesService = inject(SolicitudesService);
+  private estudianteService = inject(EstudianteService);
   public authService = inject(AuthService); 
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
@@ -55,36 +57,26 @@ export class ListaSolicitudesComponent implements OnInit{
     this.cargarSolicitudes();
   }
 
-  /**
-   * Obtiene la lista de solicitudes desde el backend aplicando los filtros vigentes
-   */
-  cargarSolicitudes(): void {
-    // const filtro: FiltroSolicitud = {
-    //   estadoId: this.estadoSeleccionado(),
-    //   tipoApoyoId: this.tipoApoyoSeleccionado(),
-    //   terminoBusqueda: this.busqueda()
-    // };
-
-    // this.solicitudesService.listarSolicitudes(filtro).subscribe({
-    //   next: (data) => this.dataSource.set(data),
-    //   error: (err) => console.error('Error al cargar la lista de solicitudes:', err)
-    // });
-    this.solicitudesService.obtenerSolicitudes().subscribe({
-      next: (data) => this.dataSource.set(data),
-      error: (err) => console.error('Error al cargar la lista de solicitudes:', err)
-    });
+  
+  cargarSolicitudes(): void {    
+    if(this.authService.esAsesor()) {
+      this.solicitudesService.obtenerSolicitudes().subscribe({
+        next: (data) => this.dataSource.set(data),
+        error: (err) => console.error('Error al cargar la lista de solicitudes:', err)
+      });
+    }
+    else{
+      this.estudianteService.obtenerSolicitudesXEstudiante(this.authService.getUserId()!).subscribe({
+        next: (data) => this.dataSource.set(data),
+        error: (err) => console.error('Error al cargar la lista de solicitudes:', err)
+      });
+    }
   }
 
-  /**
-   * Dispara el recargado de la tabla al cambiar cualquier filtro
-   */
   onFiltroChange(): void {
     this.cargarSolicitudes();
   }
 
-  /**
-   * Abre el diálogo modal para crear una nueva solicitud (Exclusivo para Asesor)
-   */
   abrirModalCrear(): void {
     if (!this.authService.esAsesor()) return;
 
