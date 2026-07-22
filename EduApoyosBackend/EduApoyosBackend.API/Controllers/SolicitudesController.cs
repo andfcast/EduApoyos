@@ -1,6 +1,7 @@
 ﻿using EduApoyosBackend.Application.DTOs;
 using EduApoyosBackend.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -19,21 +20,27 @@ namespace EduApoyosBackend.API.Controllers
             _logger = logger;
         }
 
+        //[HttpGet]
+        //[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<SolicitudApoyoDto>))]
+        //public async Task<IActionResult> Get()
+        //{
+        //    _logger.LogInformation("Intentando obtener las solicitudes");
+        //    var result = await _service.ObtenerSolicitudesAsync();
+        //    return Ok(result);
+        //}
+
+        /// <summary>
+        /// GET /api/solicitudes
+        /// Parámetros en query string: tipoApoyoId, fecha, estadoId, pagina, tamanoPagina
+        /// Ejemplo: /api/solicitudes?tipoApoyoId=1&estadoId=2&pagina=1&tamanoPagina=5
+        /// </summary>
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<SolicitudApoyoDto>))]
-        public async Task<IActionResult> Get()
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RespuestaPaginadaDto<SolicitudApoyoDto>))]
+        public async Task<ActionResult<RespuestaPaginadaDto<SolicitudApoyoDto>>> GetSolicitudes([FromQuery] FiltroSolicitudDto filtro)
         {
             _logger.LogInformation("Intentando obtener las solicitudes");
-            var result = await _service.ObtenerSolicitudesAsync();
-            return Ok(result);
-        }
-
-        // GET api/<SolicitudesController>/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(Guid id)
-        {
-            var result = await _service.ObtenerSolicitudAsync(id);
-            return Ok(result);
+            var resultado = await _service.ObtenerSolicitudesFiltradasAsync(filtro);
+            return Ok(resultado);
         }
 
         // POST api/<SolicitudesController>

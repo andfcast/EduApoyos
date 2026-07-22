@@ -35,3 +35,11 @@ export interface HistorialEstadoSolicitud {
     fechaCambio: Date;
     observacion: string;
 }
+
+export interface FiltroSolicitud {
+  estadoId?: number | null;
+  tipoApoyoId?: number | null;
+  fecha?: string | null;  
+  pagina: number;        
+  tamanoPagina: number;
+}

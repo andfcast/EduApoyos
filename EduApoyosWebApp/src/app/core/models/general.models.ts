@@ -12,3 +12,10 @@ export interface TipoApoyo extends General {}
 
 export interface EstadoSolicitud extends General {}
 
+export interface RespuestaPaginada<T> {
+  elementos: T[];
+  totalRegistros: number;
+  paginaActual: number;
+  totalPaginas: number;
+}
+

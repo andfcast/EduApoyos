@@ -74,6 +74,71 @@ namespace EduApoyosBackend.Application.Services
             };
         }
 
+        public async Task<RespuestaPaginadaDto<SolicitudApoyoDto>> ObtenerSolicitudesFiltradasAsync(FiltroSolicitudDto filtro)
+        {
+            // 1. Iniciamos la consulta sobre el IQueryable que expone el GenericRepository
+            var query = _unitOfWork.Solicitudes.Query();            
+
+            // 3. Filtro Opcional 1: Tipo de Apoyo
+            if (filtro.TipoApoyoId.HasValue && filtro.TipoApoyoId.Value > 0)
+            {
+                query = query.Where(s => s.TipoApoyoId == filtro.TipoApoyoId.Value);
+            }
+
+            // 4. Filtro Opcional 2: Fecha (Compara unicamente el componente Date sin la hora)
+            if (filtro.Fecha.HasValue)
+            {
+                var fechaFiltro = filtro.Fecha.Value.Date;
+                query = query.Where(s => s.FechaSolicitud.Date == fechaFiltro);
+            }
+
+            // 5. Filtro Opcional 3: Estado
+            if (filtro.EstadoId.HasValue && filtro.EstadoId.Value > 0)
+            {
+                query = query.Where(s => s.EstadoSolicitudId == filtro.EstadoId.Value);
+            }
+
+            // 6. Conteo total de coincidencias antes de aplicar el Skip y Take
+            var totalRegistros = await query.CountAsync();
+
+            // 7. Paginación y Proyección directa a DTO
+            var elementos = await query
+                .OrderByDescending(s => s.FechaSolicitud)
+                .Skip((filtro.Pagina - 1) * filtro.TamanoPagina)
+                .Take(filtro.TamanoPagina)
+                .Select(solicitud => new SolicitudApoyoDto
+                {
+                    Id = solicitud.Id,
+                    Descripcion = solicitud.Descripcion,
+                    Estado = solicitud.EstadoSolicitud.Nombre,                    
+                    FechaSolicitud = solicitud.FechaSolicitud,
+                    MontoSolicitado = solicitud.MontoSolicitado,
+                    TipoApoyo = solicitud.TipoApoyo.Nombre,                    
+                    NombreEstudiante = solicitud.Estudiante.Usuario.NombreCompleto,
+                    NombreAsesor = solicitud.Asesor != null ? solicitud.Asesor.NombreCompleto : string.Empty,
+                    FechaActualizacion = solicitud.FechaActualizacion,
+                    HistorialEstados = solicitud.HistorialEstados.Select(h => new HistorialEstadoDto
+                    {
+                        Id = h.Id,
+                        SolicitudId = h.SolicitudId,
+                        EstadoAnterior = h.EstadoAnteriorId == null || h.EstadoAnteriorId == 0 ? string.Empty : h.EstadoAnterior.Nombre,
+                        EstadoSiguiente = h.EstadoNuevo.Nombre,
+                        FechaCambio = h.FechaCambio,
+                        Observacion = h.Observacion
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            // 8. Retorno del objeto paginado
+            return new RespuestaPaginadaDto<SolicitudApoyoDto>
+            {
+                Elementos = elementos,
+                TotalRegistros = totalRegistros,
+                PaginaActual = filtro.Pagina,
+                TotalPaginas = (int)Math.Ceiling((double)totalRegistros / filtro.TamanoPagina)
+            };
+        }
+
         public async Task<string> RegistrarSolicitudAsync(RegistroSolicitudDto dto)
         {
             var solicitud = new Domain.Entities.SolicitudApoyo(

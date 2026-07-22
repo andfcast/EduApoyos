@@ -14,5 +14,6 @@ namespace EduApoyosBackend.Application.Interfaces
         Task<SolicitudApoyoDto> ObtenerSolicitudAsync(Guid solicitudId);
         Task<string> ActualizarEstadoSolicitudAsync(Guid solicitudId, ActualizarEstadoSolicitudDto dto);
         Task<IEnumerable<SolicitudApoyoDto>> ObtenerSolicitudesXEstudianteAsync(Guid id);
+        Task<RespuestaPaginadaDto<SolicitudApoyoDto>> ObtenerSolicitudesFiltradasAsync(FiltroSolicitudDto filtro);
     }
 }
