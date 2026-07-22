@@ -14,12 +14,12 @@
     <!-- Tipo de Documento -->
     <mat-form-field appearance="outline">
       <mat-label>Tipo de Documento</mat-label>
-      <mat-select formControlName="tipoDocumento">
+      <mat-select formControlName="tipoDocumentoId">
         @for (tipo of tiposDocumento(); track tipo.id) {
-          <mat-option [value]="tipo.codigo">{{ tipo.nombre }}</mat-option>
+          <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
         }
       </mat-select>
-      @if (form.get('tipoDocumento')?.hasError('required')) {
+      @if (form.get('tipoDocumentoId')?.hasError('required')) {
         <mat-error>El tipo de documento es obligatorio</mat-error>
       }
     </mat-form-field>
@@ -50,22 +50,25 @@
     <!-- Correo Electrónico -->
     <mat-form-field appearance="outline">
       <mat-label>Correo Electrónico</mat-label>
-      <input matInput type="email" formControlName="correo" placeholder="estudiante@institucion.edu.co">
+      <input matInput type="email" formControlName="email" placeholder="estudiante@institucion.edu.co">
       <mat-icon matSuffix>email</mat-icon>
-      @if (form.get('correo')?.hasError('required')) {
+      @if (form.get('email')?.hasError('required')) {
         <mat-error>El correo es obligatorio</mat-error>
-      } @else if (form.get('correo')?.hasError('email')) {
+      } @else if (form.get('email')?.hasError('email')) {
         <mat-error>Formato de correo inválido</mat-error>
       }
     </mat-form-field>
 
-    <!-- Contraseña (Reemplaza al Teléfono) -->
+    <!-- Contraseña -->
     <mat-form-field appearance="outline">
-      <mat-label>Contraseña</mat-label>
+      <mat-label>{{ isEditMode ? 'Nueva Contraseña (Opcional)' : 'Contraseña' }}</mat-label>
       <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" placeholder="Mínimo 8 caracteres">
       <button mat-icon-button matSuffix (click)="togglePasswordVisibility()" type="button" [attr.aria-label]="'Ocultar contraseña'" [attr.aria-pressed]="hidePassword()">
         <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
       </button>
+      @if (isEditMode) {
+        <mat-hint>Déjala en blanco si no deseas cambiarla</mat-hint>
+      }
       @if (form.get('password')?.hasError('required')) {
         <mat-error>La contraseña es obligatoria</mat-error>
       } @else if (form.get('password')?.hasError('pattern')) {
@@ -76,12 +79,12 @@
     <!-- Programa Académico -->
     <mat-form-field appearance="outline">
       <mat-label>Programa Académico</mat-label>
-      <mat-select formControlName="programaAcademico">
+      <mat-select formControlName="programaAcademicoId">
         @for (prog of programasAcademicos(); track prog.id) {
-          <mat-option [value]="prog.nombre">{{ prog.nombre }}</mat-option>
+          <mat-option [value]="prog.id">{{ prog.nombre }}</mat-option>
         }
       </mat-select>
-      @if (form.get('programaAcademico')?.hasError('required')) {
+      @if (form.get('programaAcademicoId')?.hasError('required')) {
         <mat-error>Seleccione un programa académico</mat-error>
       }
     </mat-form-field>

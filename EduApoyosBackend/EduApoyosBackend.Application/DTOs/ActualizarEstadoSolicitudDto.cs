@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace EduApoyosBackend.Application.DTOs
 {
-    public class EstadoSolicitudDto
+    public class ActualizarEstadoSolicitudDto
     {
-        public int Id { get; set; }
-        public string Nombre { get; set; } = string.Empty;
+        public int EstadoId { get; set; }
+        public Guid UsuarioId { get; set; }
     }
 }

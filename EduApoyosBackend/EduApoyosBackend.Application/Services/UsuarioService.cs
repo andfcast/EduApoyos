@@ -43,6 +43,7 @@ namespace EduApoyosBackend.Application.Services
             if (dto.RolId == 2) { 
                 var nuevoEstudiante = new Estudiante(Guid.NewGuid(), nuevoUsuario.Id,1,"",1,1);
                 await _unitOfWork.Estudiantes.AgregarAsync(nuevoEstudiante);
+                await _unitOfWork.SaveChangesAsync();
             }
 
             return "Usuario registrado con éxito de manera segura.";

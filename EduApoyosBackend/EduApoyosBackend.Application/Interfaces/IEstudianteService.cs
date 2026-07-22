@@ -10,6 +10,7 @@ namespace EduApoyosBackend.Application.Interfaces
     public interface IEstudianteService
     {
         Task<string> RegistrarEstudianteAsync(RegistroEstudianteDto dto);
-        Task<IEnumerable<EstudianteDto>> ObtenerEstudiantesAsync();        
+        Task<IEnumerable<EstudianteDto>> ObtenerEstudiantesAsync();
+        Task<string> ActualizarEstudianteAsync(EdicionEstudianteDto dto);
     }
 }

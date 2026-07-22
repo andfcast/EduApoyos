@@ -30,6 +30,11 @@ export const routes: Routes = [
         path: 'estudiantes',
         canActivate: [roleGuard('Asesor')],
         loadComponent: () => import('./features/estudiantes/lista-estudiantes-component/lista-estudiantes-component').then(m => m.ListaEstudiantesComponent)
+      },
+      {
+        path: 'solicitudes',
+        canActivate: [roleGuard('Asesor')],
+        loadComponent: () => import('./features/solicitudes/lista-solicitudes-component/lista-solicitudes-component').then(m => m.ListaSolicitudesComponent)
       }, 
 
       // Rutas para Estudiante

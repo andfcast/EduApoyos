@@ -1,10 +1,14 @@
-export interface TipoDocumento {
-  id: number;
-  codigo: string;
+export interface General{
+   id: number;  
   nombre: string;
+}
+export interface TipoDocumento extends General {  
+  codigo: string;  
 }
 
-export interface ProgramaAcademico {
-  id: number;  
-  nombre: string;
-}
+export interface ProgramaAcademico extends General {}
+
+export interface TipoApoyo extends General {}
+
+export interface EstadoSolicitud extends General {}
+

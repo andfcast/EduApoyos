@@ -4,6 +4,7 @@ using EduApoyosBackend.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260721213135_AgregarSolicitud")]
+    partial class AgregarSolicitud
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -225,9 +228,6 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTime>("FechaSolicitud")
                         .HasColumnType("datetime2");
-
-                    b.Property<double>("MontoSolicitado")
-                        .HasColumnType("float");
 
                     b.Property<int>("TipoApoyoId")
                         .HasColumnType("int");

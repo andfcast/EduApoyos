@@ -45,6 +45,16 @@ namespace EduApoyosBackend.API.Controllers
             return Ok();
         }
 
+        // PUT api/<EstudiantesController>/5
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> Put(Guid id, [FromBody] EdicionEstudianteDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            _logger.LogInformation("Intentando actualizar el estudiante con ID: {Id}", dto.Id);
+            var resultado = await _service.ActualizarEstudianteAsync(dto);
+            return Ok();
+        }
+
         // GET api/<EstudiantesController>/5
         [HttpGet("{id}/solicitudes")]
         public string GetSolicitudes(int id)

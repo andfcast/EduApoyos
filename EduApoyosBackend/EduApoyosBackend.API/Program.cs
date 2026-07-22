@@ -49,10 +49,9 @@ namespace EduApoyosBackend.API
             builder.Services.AddScoped<IEstudianteService, EstudianteService>();
             builder.Services.AddScoped<ITipoDocumentoService, TipoDocumentoService>();
             builder.Services.AddScoped<IProgramaAcademicoService, ProgramaAcademicoService>();
-            //builder.Services.AddScoped<ITipoApoyoService, TipoApoyoService>();
-            //builder.Services.AddScoped<IEstadoSolicitudService, EstadoSolicitudService>();
-            //builder.Services.AddScoped<ISolicitudApoyoService, SolicitudApoyoService>();
-            //builder.Services.AddScoped<IHistorialEstadoService, HistorialEstadoService>();
+            builder.Services.AddScoped<ITipoApoyoService, TipoApoyoService>();
+            builder.Services.AddScoped<IEstadoSolicitudService, EstadoSolicitudService>();
+            builder.Services.AddScoped<ISolicitudService, SolicitudService>();            
 
             builder.Services.AddAuthentication(opt =>
             {

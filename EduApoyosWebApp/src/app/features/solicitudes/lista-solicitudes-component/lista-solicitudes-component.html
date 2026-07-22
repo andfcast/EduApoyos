@@ -1,0 +1,140 @@
+<div class="header-container">
+  <div>
+    <h1>Gestión de Solicitudes de Apoyo</h1>
+    <p>Revisión, dictamen y registro de solicitudes académicas y socioeconómicas</p>
+  </div>
+
+  <!-- 🔒 Botón de creación exclusivo para el Asesor -->
+  @if (authService.esAsesor()) {
+    <button mat-raised-button color="primary" (click)="abrirModalCrear()">
+      <mat-icon>add_circle</mat-icon> Nueva Solicitud
+    </button>
+  }
+</div>
+
+<div class="table-container mat-elevation-z2">
+  <!-- Barra de Filtros -->
+  <div class="filter-header">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar por estudiante o documento</mat-label>
+      <input matInput [(ngModel)]="busqueda" (ngModelChange)="onFiltroChange()" placeholder="Escriba un nombre...">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select [(ngModel)]="estadoSeleccionado" (selectionChange)="onFiltroChange()">
+        <mat-option [value]="null">Todos los estados</mat-option>
+        <mat-option [value]="1">Pendiente</mat-option>
+        <mat-option [value]="2">Aprobada</mat-option>
+        <mat-option [value]="3">Rechazada</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo de Apoyo</mat-label>
+      <mat-select [(ngModel)]="tipoApoyoSeleccionado" (selectionChange)="onFiltroChange()">
+        <mat-option [value]="null">Todos los tipos</mat-option>
+        <mat-option [value]="1">Alimentario</mat-option>
+        <mat-option [value]="2">Transporte</mat-option>
+        <mat-option [value]="3">Tecnológico</mat-option>
+        <mat-option [value]="4">Matrícula</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- Tabla de Solicitudes -->
+  <table mat-table [dataSource]="dataSource()">
+
+    <!-- Estudiante -->
+    <ng-container matColumnDef="estudiante">
+      <th mat-header-cell *matHeaderCellDef> Estudiante </th>
+      <td mat-cell *matCellDef="let element">
+        <strong>{{ element.nombreEstudiante || 'Estudiante' }}</strong><br>
+        <small class="text-muted">{{ element.documentoEstudiante }}</small>
+      </td>
+    </ng-container>
+
+    <!-- Tipo de Apoyo -->
+    <ng-container matColumnDef="tipoApoyo">
+      <th mat-header-cell *matHeaderCellDef> Tipo Apoyo </th>
+      <td mat-cell *matCellDef="let element"> {{ element.tipoApoyo }} </td>
+    </ng-container>
+
+    <!-- Monto -->
+    <ng-container matColumnDef="monto">
+      <th mat-header-cell *matHeaderCellDef> Monto </th>
+      <td mat-cell *matCellDef="let element"> {{ element.montoSolicitado | currency:'COP':'symbol':'1.0-0' }} </td>
+    </ng-container>
+
+    <!-- Fecha -->
+    <ng-container matColumnDef="fecha">
+      <th mat-header-cell *matHeaderCellDef> F. Solicitud </th>
+      <td mat-cell *matCellDef="let element"> {{ element.fechaSolicitud | date:'dd/MM/yyyy' }} </td>
+    </ng-container>
+
+    <!-- Estado -->
+    <ng-container matColumnDef="estado">
+      <th mat-header-cell *matHeaderCellDef> Estado </th>
+      <td mat-cell *matCellDef="let element">
+        <span class="status-badge" [ngClass]="obtenerClaseEstado(element.estado)">
+          {{ element.estado || 'Pendiente' }}
+        </span>
+      </td>
+    </ng-container>
+
+    <!-- Acciones -->
+    <ng-container matColumnDef="acciones">
+  <th mat-header-cell *matHeaderCellDef> Acciones </th>
+  <td mat-cell *matCellDef="let element">
+      <button mat-icon-button 
+              color="primary" 
+              (click)="verDetalle(element)" 
+              matTooltip="Ver detalle">
+        <mat-icon>visibility</mat-icon>
+      </button>
+    @if (authService.esAsesor()) {
+
+      <!-- ESTADO: PENDIENTE (1) -> Botón 'En Revisión' -->
+      @if (element.estado === 'Pendiente') {
+        <button mat-flat-button 
+                color="accent" 
+                class="btn-accion" 
+                (click)="cambiarEstado(element.id, 2)">
+          <mat-icon>rate_review</mat-icon> Pasar a Revisión
+        </button>
+      }
+
+      <!-- ESTADO: EN REVISIÓN (2) -> Botones 'Aprobar' y 'Rechazar' -->
+      @else if (element.estado === 'En Revisión') {
+        <div class="btn-group">
+          <button mat-flat-button 
+                  class="btn-aprobar" 
+                  (click)="cambiarEstado(element.id, 3)">
+            <mat-icon>check_circle</mat-icon> Aprobar
+          </button>
+
+          <button mat-flat-button 
+                  color="warn" 
+                  class="btn-accion" 
+                  (click)="cambiarEstado(element.id, 4)">
+            <mat-icon>cancel</mat-icon> Rechazar
+          </button>
+        </div>
+      }
+
+      <!-- ESTADOS FINALES: APROBADA (3) O RECHAZADA (4) -> No muestra acciones -->
+      @else {
+        <span class="text-muted"><mat-icon class="icon-done">done_all</mat-icon> Finalizada</span>
+      }
+
+    } @else {
+      <span class="text-muted">Solo lectura</span>
+    }
+  </td>
+</ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EduApoyosBackend.Application.DTOs;
+using EduApoyosBackend.Application.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,42 +10,48 @@ namespace EduApoyosBackend.API.Controllers
     [ApiController]
     public class SolicitudesController : ControllerBase
     {
-        // GET: api/<SolicitudesController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly ISolicitudService _service;
+        private readonly ILogger<SolicitudesController> _logger;
+
+        public SolicitudesController(ISolicitudService service, ILogger<SolicitudesController> logger)
         {
-            return new string[] { "value1", "value2" };
+            _service = service;
+            _logger = logger;
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<SolicitudApoyoDto>))]
+        public async Task<IActionResult> Get()
+        {
+            _logger.LogInformation("Intentando obtener las solicitudes");
+            var result = await _service.ObtenerSolicitudesAsync();
+            return Ok(result);
         }
 
         // GET api/<SolicitudesController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<IActionResult> Get(Guid id)
         {
-            return "value";
+            var result = await _service.ObtenerSolicitudAsync(id);
+            return Ok(result);
         }
 
         // POST api/<SolicitudesController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] RegistroSolicitudDto dto)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            _logger.LogInformation("Intentando registrar un nueva solicitud");
+            var resultado = await _service.RegistrarSolicitudAsync(dto);
+            return NoContent();
         }
-
-        // PUT api/<SolicitudesController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // PUT api/<SolicitudesController>/5
+                
         [HttpPatch("{id}/estado")]
-        public void Patch(int id, [FromBody] string value)
+        public async Task<IActionResult> Patch(Guid id, [FromBody] ActualizarEstadoSolicitudDto dto)
         {
+            var resultado = await _service.ActualizarEstadoSolicitudAsync(id, dto);
+            _logger.LogInformation("Intentando actualizar el estado de una solicitud" + id.ToString());
+            return NoContent();
         }
-
-        //// DELETE api/<SolicitudesController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
     }
 }

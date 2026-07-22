@@ -45,7 +45,23 @@ export class AuthService {
   getToken(): string | null {
     return this.currentUser()?.token ?? null;
   }
-  
+
+  getUserRole(): 'Asesor' | 'Estudiante' | null {
+    return this.currentUser()?.rol ?? null;
+  }
+
+  getUserId(): string | null {
+    return this.currentUser()?.usuarioId ?? null;
+  }
+
+  esEstudiante(): boolean {
+    return this.getUserRole() === 'Estudiante';
+  }
+
+  esAsesor(): boolean {
+    return this.getUserRole() === 'Asesor';
+  }
+
   logout(): void {
     if (this.hasLocalStorage) {
       localStorage.removeItem(this.sessionKey);

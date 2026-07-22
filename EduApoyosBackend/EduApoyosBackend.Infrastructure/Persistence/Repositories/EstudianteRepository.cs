@@ -18,5 +18,14 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Repositories
         {
             return await _context.Estudiantes.AnyAsync(e => e.TipoDocumentoId == tipoDocumento && e.NumeroDocumento == numDocumento);
         }
+
+        public async Task<IEnumerable<Estudiante>> ListarConRelacionesAsync()
+        {
+            return await _context.Estudiantes
+                .Include(e => e.TipoDocumento)
+                .Include(e => e.Usuario)
+                .Include(e => e.ProgramaAcademico)
+                .ToListAsync();
+        }
     }
 }

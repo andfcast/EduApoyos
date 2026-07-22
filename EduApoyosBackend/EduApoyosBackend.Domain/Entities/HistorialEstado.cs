@@ -9,16 +9,16 @@ namespace EduApoyosBackend.Domain.Entities
 {
     public class HistorialEstado : BaseEntity<Guid>
     {
-        public Guid SolicitudId { get; private set; }
+        public Guid SolicitudId { get;  set; }
         public SolicitudApoyo Solicitud { get; private set; } = null!;
-        public int? EstadoAnteriorId { get; private set; }
+        public int? EstadoAnteriorId { get;  set; }
         public EstadoSolicitud? EstadoAnterior { get; private set; }
-        public int EstadoNuevoId { get; private set; }
+        public int EstadoNuevoId { get;  set; }
         public EstadoSolicitud EstadoNuevo { get; private set; } = null!;
-        public DateTime FechaCambio { get; private set; }
-        public Guid UsuarioId { get; private set; }
+        public DateTime FechaCambio { get; set; }
+        public Guid UsuarioId { get;  set; }
         public Usuario Usuario { get; private set; } = null!;
-        public string Observacion { get; private set; }
+        public string Observacion { get; set; }
 
         public HistorialEstado(Guid id, Guid solicitudId, int? estadoAnteriorId, int estadoNuevoId, DateTime fechaCambio, Guid usuarioId, string observacion)
         {
