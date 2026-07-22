@@ -14,7 +14,7 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Repositories
     {
         public UsuarioRepository(AppDbContext context) : base(context) { }
         public async Task<Usuario?> ObtenerPorCorreoAsync(string email) {
-            return await _context.Usuarios
+            return await _context.Usuarios.Include(s =>s.Rol)
             .FirstOrDefaultAsync(u => u.Email == email);
         }
         public async Task<bool> ExisteUsuarioConCorreoAsync(string email)

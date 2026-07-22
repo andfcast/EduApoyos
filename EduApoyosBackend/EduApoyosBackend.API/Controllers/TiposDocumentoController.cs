@@ -1,5 +1,6 @@
 ﻿using EduApoyosBackend.Application.DTOs;
 using EduApoyosBackend.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -8,6 +9,7 @@ namespace EduApoyosBackend.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TiposDocumentoController : ControllerBase
     {
         private readonly ITipoDocumentoService _service;

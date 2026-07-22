@@ -1,5 +1,6 @@
 ﻿using EduApoyosBackend.Application.DTOs;
 using EduApoyosBackend.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -9,6 +10,7 @@ namespace EduApoyosBackend.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SolicitudesController : ControllerBase
     {
         private readonly ISolicitudService _service;
@@ -35,6 +37,7 @@ namespace EduApoyosBackend.API.Controllers
         /// Ejemplo: /api/solicitudes?tipoApoyoId=1&estadoId=2&pagina=1&tamanoPagina=5
         /// </summary>
         [HttpGet]
+        [Authorize(Roles = "Asesor")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RespuestaPaginadaDto<SolicitudApoyoDto>))]
         public async Task<ActionResult<RespuestaPaginadaDto<SolicitudApoyoDto>>> GetSolicitudes([FromQuery] FiltroSolicitudDto filtro)
         {
@@ -52,7 +55,8 @@ namespace EduApoyosBackend.API.Controllers
             var resultado = await _service.RegistrarSolicitudAsync(dto);
             return NoContent();
         }
-                
+
+        [Authorize(Roles = "Asesor")]
         [HttpPatch("{id}/estado")]
         public async Task<IActionResult> Patch(Guid id, [FromBody] ActualizarEstadoSolicitudDto dto)
         {

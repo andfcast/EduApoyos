@@ -1,6 +1,7 @@
 ﻿using EduApoyosBackend.Application.DTOs;
 using EduApoyosBackend.Application.Interfaces;
 using EduApoyosBackend.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -9,6 +10,7 @@ namespace EduApoyosBackend.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class EstudiantesController : ControllerBase
     {
         private readonly IEstudianteService _service;
@@ -23,6 +25,7 @@ namespace EduApoyosBackend.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Asesor")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<EstudianteDto>))]
         public async Task<IActionResult> Get()
         {
@@ -32,6 +35,7 @@ namespace EduApoyosBackend.API.Controllers
         
         // POST api/<EstudiantesController>
         [HttpPost]
+        [Authorize(Roles = "Asesor")]
         public async Task<IActionResult> Post([FromBody] RegistroEstudianteDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -50,6 +54,7 @@ namespace EduApoyosBackend.API.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = "Estudiante")]
         // GET api/<EstudiantesController>/id/solicitudes
         [HttpGet("{id:guid}/solicitudes")]
         public async Task<IActionResult> GetSolicitudes(Guid id)
