@@ -1,0 +1,65 @@
+<h2 mat-dialog-title>
+  <mat-icon color="primary">add_circle</mat-icon> Registrar Nueva Solicitud
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="form" class="solicitud-form">
+
+    <!-- Combo Estudiantes -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Estudiante</mat-label>
+      <mat-select formControlName="estudianteId" placeholder="Seleccione el estudiante">
+        @for (est of estudiantes(); track est.id) {
+          <mat-option [value]="est.id">
+            {{ est.nombreCompleto }} 
+          </mat-option>
+        }
+      </mat-select>
+      @if (form.get('estudianteId')?.hasError('required')) {
+        <mat-error>Debe seleccionar un estudiante</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Combo Tipo de Apoyo -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Tipo de Apoyo</mat-label>
+      <mat-select formControlName="tipoApoyoId" placeholder="Seleccione el tipo de apoyo">
+        @for (tipo of tiposApoyo(); track tipo.id) {
+          <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
+        }
+      </mat-select>
+      @if (form.get('tipoApoyoId')?.hasError('required')) {
+        <mat-error>Debe seleccionar el tipo de apoyo</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Monto Solicitado -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Monto Solicitado (COP)</mat-label>
+      <span matPrefix>$ &nbsp;</span>
+      <input matInput type="number" formControlName="montoSolicitado" placeholder="Ej: 500000">
+      @if (form.get('montoSolicitado')?.hasError('required') || form.get('montoSolicitado')?.hasError('min')) {
+        <mat-error>Ingrese un monto válido superior a cero</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Descripción / Justificación -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Descripción / Justificación</mat-label>
+      <textarea matInput formControlName="descripcion" rows="4" placeholder="Describa el motivo o sustento de la solicitud..."></textarea>
+      @if (form.get('descripcion')?.hasError('required')) {
+        <mat-error>La descripción es requerida</mat-error>
+      } @else if (form.get('descripcion')?.hasError('minlength')) {
+        <mat-error>Mínimo 10 caracteres</mat-error>
+      }
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="guardar()">
+    <mat-icon>save</mat-icon> Registrar Solicitud
+  </button>
+</mat-dialog-actions>

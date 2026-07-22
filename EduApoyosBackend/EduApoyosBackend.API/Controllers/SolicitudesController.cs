@@ -43,15 +43,15 @@ namespace EduApoyosBackend.API.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
             _logger.LogInformation("Intentando registrar un nueva solicitud");
             var resultado = await _service.RegistrarSolicitudAsync(dto);
-            return Ok();
+            return NoContent();
         }
                 
         [HttpPatch("{id}/estado")]
-        public async Task<IActionResult> Patch(Guid id)
+        public async Task<IActionResult> Patch(Guid id, [FromBody] ActualizarEstadoSolicitudDto dto)
         {
-            var resultado = await _service.ActualizarEstadoSolicitudAsync(id);
+            var resultado = await _service.ActualizarEstadoSolicitudAsync(id, dto);
             _logger.LogInformation("Intentando actualizar el estado de una solicitud" + id.ToString());
-            return Ok(resultado);
+            return NoContent();
         }
     }
 }

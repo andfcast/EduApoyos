@@ -45,15 +45,15 @@ export class EstudianteFormDialogComponent implements OnInit {
     const passwordValidators = this.isEditMode
       ? [Validators.pattern(this.passwordPattern)]
       : [Validators.required, Validators.pattern(this.passwordPattern)];
-
-
+    
     this.form = this.fb.group({
-      tipoDocumento: [data?.tipoDocumentoId || 1, [Validators.required]],
+      id: [data?.id || crypto.randomUUID()],
+      tipoDocumentoId: [data?.tipoDocumentoId || 1, [Validators.required]],
       numeroDocumento: [data?.numeroDocumento || '', [Validators.required, Validators.pattern('^[0-9]+$')]],
       nombreCompleto: [data?.nombreCompleto || '', [Validators.required, Validators.minLength(3)]],
-      correo: [data?.email || '', [Validators.required, Validators.email]],      
+      email: [data?.email || '', [Validators.required, Validators.email]],      
       password: ['', passwordValidators],
-      programaAcademico: [data?.programaAcademico || '', [Validators.required]],
+      programaAcademicoId: [data?.programaAcademicoId || '', [Validators.required]],
       semestre: [data?.semestre || 1, [Validators.required, Validators.min(1), Validators.max(12)]],      
       activo: [data?.activo ?? true, null]      
     });

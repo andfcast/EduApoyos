@@ -1,0 +1,41 @@
+
+h2[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1a237e; 
+  margin-bottom: 0.5rem;
+}
+
+.dialog-content {
+  padding-top: 0.75rem !important;
+
+  .solicitud-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .full-width {
+      width: 100%;
+    }
+
+    /* Estilo para el prefijo de moneda $ */
+    span[matPrefix] {
+      color: #555;
+      font-weight: 600;
+    }
+  }
+}
+
+mat-dialog-actions {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e0e0e0;
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+}

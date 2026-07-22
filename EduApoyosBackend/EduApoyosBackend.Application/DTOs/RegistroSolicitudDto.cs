@@ -21,13 +21,13 @@ namespace EduApoyosBackend.Application.DTOs
         [Required(ErrorMessage = "El monto solicitado es obligatorio.")]
         [Range(0.01, 100_000_000.00, ErrorMessage = "El monto debe ser un valor positivo mayor a cero.")]
         [DataType(DataType.Currency)]
-        public double Monto { get; set; }
+        public double MontoSolicitado { get; set; }
 
         [Required(ErrorMessage = "La descripción o justificación es obligatoria.")]
         [StringLength(1000, MinimumLength = 10, ErrorMessage = "La descripción debe tener entre 10 y 1000 caracteres.")]
         public string Descripcion { get; set; } = string.Empty;
 
-        [Range(1, 10, ErrorMessage = "El estado especificado no es válido.")]
+        [Range(1, 4, ErrorMessage = "El estado especificado no es válido.")]
         public int EstadoId { get; set; } = 1;
 
         [DataType(DataType.DateTime)]

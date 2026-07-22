@@ -1,0 +1,47 @@
+<h2 mat-dialog-title class="dialog-header">
+      Detalle de la Solicitud
+      <button mat-icon-button mat-dialog-close>
+        <mat-icon>close</mat-icon>
+      </button>
+    </h2>
+
+    <mat-dialog-content>
+      <div class="detalle-grid">
+        <div class="detalle-item">
+          <strong>Estudiante:</strong>
+          <span>{{ data.nombreEstudiante || 'N/A' }} </span>
+        </div>
+        
+        <div class="detalle-item">
+          <strong>Tipo de Apoyo:</strong>
+          <span>{{ data.tipoApoyo }}</span>
+        </div>
+        
+        <div class="detalle-item">
+          <strong>Monto Solicitado:</strong>
+          <span>{{ data.montoSolicitado | currency:'COP':'symbol':'1.0-0' }}</span>
+        </div>
+        
+        <div class="detalle-item">
+          <strong>Fecha de Solicitud:</strong>
+          <span>{{ data.fechaSolicitud | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+
+        <div class="detalle-item">
+          <strong>Estado Actual:</strong>
+          <span class="status-badge" [ngClass]="obtenerClaseEstado(data.estado)">
+            {{ data.estado || 'Pendiente' }}
+          </span>
+        </div>
+  
+        <div class="detalle-item mt-2">
+        <strong>Descripción / Justificación:</strong>
+        <p class="observaciones-texto">{{ data.descripcion }}</p>
+        </div>
+        
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close>Cerrar</button>
+    </mat-dialog-actions>

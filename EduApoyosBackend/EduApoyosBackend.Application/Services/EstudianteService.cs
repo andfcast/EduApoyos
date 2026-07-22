@@ -28,14 +28,17 @@ namespace EduApoyosBackend.Application.Services
 
         public async Task<IEnumerable<EstudianteDto>> ObtenerEstudiantesAsync()
         {
-            var estudiantes = await _unitOfWork.Estudiantes.ListarAsync();
-            return estudiantes.Select(e => new EstudianteDto
+            var estudiantes = await _unitOfWork.Estudiantes.ListarConRelacionesAsync();
+            return estudiantes.Select(e => new EstudianteDto            
             {
+                Id = e.Id,
                 UsuarioId = e.UsuarioId,
                 TipoDocumento = e.TipoDocumento.Descripcion,
+                TipoDocumentoId = e.TipoDocumentoId,
                 NumeroDocumento = e.NumeroDocumento,
                 NombreCompleto = e.Usuario.NombreCompleto,
-                Correo = e.Usuario.Email,
+                Email = e.Usuario.Email,
+                ProgramaAcademicoId = e.ProgramaAcademicoId,
                 ProgramaAcademico = e.ProgramaAcademico.Descripcion,
                 Semestre = e.Semestre,
                 Activo = e.Activo
@@ -70,7 +73,7 @@ namespace EduApoyosBackend.Application.Services
             return "Estudiante registrado con éxito de manera segura.";
         }
 
-        public async Task<string> ActualizarEstudianteAsync(RegistroEstudianteDto dto)
+        public async Task<string> ActualizarEstudianteAsync(EdicionEstudianteDto dto)
         {
             var estudiante = await _unitOfWork.Estudiantes.ObtenerPorGuidAsync(dto.Id);
             if (estudiante == null)

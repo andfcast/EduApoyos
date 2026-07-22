@@ -15,8 +15,7 @@ import { AuthService } from '../../core/services/auth.service';
   selector: 'app-main-layout-component',
   imports: [
     RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
+    RouterLink,    
     MatSidenavModule,
     MatToolbarModule,
     MatListModule,

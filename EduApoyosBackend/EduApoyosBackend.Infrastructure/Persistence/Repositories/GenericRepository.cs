@@ -2,6 +2,7 @@
 using EduApoyosBackend.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using System;
+using EduApoyosBackend.Domain.Entities;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -26,6 +27,21 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Repositories
 
         public async Task<IEnumerable<T>> ListarAsync()
         {
+            // Si el repositorio se instancia para SolicitudApoyo, cargamos explícitamente
+            // las relaciones necesarias para evitar NullReference al proyectar DTOs.
+            if (typeof(T) == typeof(SolicitudApoyo))
+            {
+                var lista = await _context.Set<SolicitudApoyo>()
+                    .Include(s => s.EstadoSolicitud)
+                    .Include(s => s.TipoApoyo)
+                    .Include(s => s.Estudiante)
+                        .ThenInclude(e => e.Usuario)
+                    .Include(s => s.Asesor)
+                    .ToListAsync();
+
+                return lista.Cast<T>();
+            }
+
             return await _context.Set<T>().ToListAsync();
         }
 

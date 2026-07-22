@@ -4,7 +4,7 @@ export interface Solicitud {
     tipoApoyo: string;
     montoSolicitado: number;
     descripcion: string;
-    estado: string;
+    estado: string;    
     fechaSolicitud: Date;
     fechaActualizacion: Date;
     nombreAsesor: string;
@@ -20,6 +20,11 @@ export interface RegistroSolicitud {
     estadoId: string;
     fechaSolicitud: Date;
     asesorId: string;
+}
+
+export interface CambioEstadoSolicitud {
+    estadoId: number;
+    usuarioId: string;
 }
 
 export interface HistorialEstadoSolicitud {

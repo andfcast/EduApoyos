@@ -78,11 +78,11 @@ namespace EduApoyosBackend.Application.Services
             );
             await _unitOfWork.Solicitudes.AgregarAsync(solicitud);
             await _unitOfWork.SaveChangesAsync();
-            await _unitOfWork.HistorialEstados.AgregarAsync(new HistorialEstado(Guid.NewGuid(), solicitud.Id, 0, solicitud.EstadoSolicitudId, DateTime.UtcNow, Guid.Empty, $"Solicitud registrada"));
+            await _unitOfWork.HistorialEstados.AgregarAsync(new HistorialEstado(Guid.NewGuid(), solicitud.Id, 1, solicitud.EstadoSolicitudId, DateTime.UtcNow, dto.AsesorId, $"Solicitud registrada"));
             await _unitOfWork.SaveChangesAsync();
             return "Solicitud registrada con éxito de manera segura.";
         }
-        public async Task<string> ActualizarEstadoSolicitudAsync(Guid solicitudId)
+        public async Task<string> ActualizarEstadoSolicitudAsync(Guid solicitudId, ActualizarEstadoSolicitudDto dto)
         {
             var solicitud = await _unitOfWork.Solicitudes.ObtenerPorGuidAsync(solicitudId);
             if (solicitud == null)
@@ -90,10 +90,10 @@ namespace EduApoyosBackend.Application.Services
                 throw new InvalidOperationException("La solicitud no existe.");
             }
             var estadoAnterior = solicitud.EstadoSolicitudId;
-            int nuevoEstadoId = estadoAnterior+=1; // Incrementar el estado en 1
+            int nuevoEstadoId = dto.EstadoId; // Usar el ID del estado proporcionado en el DTO
             solicitud.ActualizarEstado(nuevoEstadoId);
             await _unitOfWork.SaveChangesAsync();
-            await _unitOfWork.HistorialEstados.AgregarAsync(new HistorialEstado(Guid.NewGuid(), solicitudId, estadoAnterior, nuevoEstadoId, DateTime.UtcNow, Guid.Empty, $"Cambio de estado de {estadoAnterior} a {nuevoEstadoId}"));
+            await _unitOfWork.HistorialEstados.AgregarAsync(new HistorialEstado(Guid.NewGuid(), solicitudId, estadoAnterior, nuevoEstadoId, DateTime.UtcNow, dto.UsuarioId, $"Cambio de estado de {estadoAnterior} a {nuevoEstadoId}"));
             await _unitOfWork.SaveChangesAsync();
             return "Estado de la solicitud actualizado con éxito.";
         }

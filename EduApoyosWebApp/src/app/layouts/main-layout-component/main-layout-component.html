@@ -31,6 +31,10 @@
             <mat-icon matListItemIcon>people</mat-icon>
             <span matListItemTitle>Gestión Estudiantes</span>
           </a>
+          <a mat-list-item routerLink="/dashboard/solicitudes">
+            <mat-icon matListItemIcon>assignment</mat-icon>
+            <span matListItemTitle>Gestión Solicitudes</span>
+          </a>
         } @else if (authService.userRole() === 'Estudiante') {
           <a mat-list-item routerLink="/dashboard/estudiante">
             <mat-icon matListItemIcon>person</mat-icon>

@@ -33,7 +33,7 @@
           <!-- Documento -->
           <ng-container matColumnDef="documento">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Documento </th>
-            <td mat-cell *matCellDef="let element"> {{ element.tipoDocumento }}: {{ element.numeroDocumento }} </td>
+            <td mat-cell *matCellDef="let element">{{ element.numeroDocumento }} </td>
           </ng-container>
 
           <!-- Nombre -->
@@ -45,7 +45,7 @@
           <!-- Correo -->
           <ng-container matColumnDef="correo">
             <th mat-header-cell *matHeaderCellDef> Correo </th>
-            <td mat-cell *matCellDef="let element"> {{ element.correo }} </td>
+            <td mat-cell *matCellDef="let element"> {{ element.email }} </td>
           </ng-container>
 
           <!-- Programa -->
