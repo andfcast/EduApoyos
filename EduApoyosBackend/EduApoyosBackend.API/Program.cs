@@ -33,7 +33,9 @@ namespace EduApoyosBackend.API
                 options.AddPolicy(name: myAllowSpecificOrigins,
                                   policy =>
                                   {
-                                      policy.WithOrigins("http://localhost:4200") // Puerto por defecto de Angular
+                                      policy.WithOrigins(
+                                                "http://localhost:4200",
+                                                "http://localhost:8080")
                                             .AllowAnyHeader()
                                             .AllowAnyMethod();
                                   });
