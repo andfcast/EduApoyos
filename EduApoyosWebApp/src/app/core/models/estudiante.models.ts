@@ -29,3 +29,9 @@ export interface EstudianteCombo{
   id:string;
   nombreCompleto:string;
 }
+
+export interface FiltroEstudiante{
+  textoBusqueda?:string;
+  pagina: number;        
+  tamanoPagina: number;
+}

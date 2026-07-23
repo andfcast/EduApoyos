@@ -78,6 +78,11 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Repositories
         public async Task<T?> ObtenerPorGuidAsync(Guid guid)
         {
             return await _context.Set<T>().FindAsync(guid);
-        }        
+        }
+
+        public IQueryable<T> Query()
+        {
+            return _context.Set<T>().AsNoTracking();
+        }
     }
 }

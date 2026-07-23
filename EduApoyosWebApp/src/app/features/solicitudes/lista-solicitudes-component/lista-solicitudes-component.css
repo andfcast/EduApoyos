@@ -24,10 +24,56 @@
   }
 }
 
+.filtros-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  margin-bottom: 20px;
+
+  .filtro-field {
+    flex: 1;
+    min-width: 200px;
+    margin-bottom: -1.25em; 
+  }
+
+  .filtros-acciones {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    height: 56px; 
+
+    
+    button {
+      height: 44px;         
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    
+    .mat-mdc-stroked-button {
+      border-color: rgba(0, 0, 0, 0.12); 
+      color: #555;
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+    }
+  }
+}
+
 .table-container {
   background: #ffffff;
   border-radius: 8px;
   overflow: hidden;
+  overflow-x: auto;
   padding: 1rem;
 
   .filter-header {
@@ -48,6 +94,14 @@
       margin-bottom: -1.25em;
     }
   }
+
+  .btn-group, td.mat-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap; 
+  }
+
 
   table {
     width: 100%;
@@ -70,6 +124,25 @@
       color: #78909c;
       font-size: 0.8rem;
     }
+  }
+}
+
+.btn-aprobar {
+  background-color: #2e7d32 !important;
+  color: #fff !important;
+}
+
+.btn-rechazar {
+  background-color: #f80303 !important;
+  color: #fff !important;
+}
+
+
+.mat-mdc-cell {
+  .mat-mdc-unelevated-button, .mat-mdc-raised-button, .mat-mdc-flat-button {
+    height: 36px;
+    padding: 0 12px;
+    font-size: 13px;
   }
 }
 

@@ -8,14 +8,18 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '../../../core/services/auth.service';
-import { Solicitud } from '../../../core/models/solicitud.models';
+import { FiltroSolicitud, Solicitud } from '../../../core/models/solicitud.models';
 import { SolicitudesService } from '../../../core/services/solicitud.service';
 import { SolicitudFormDialogComponent } from '../solicitud-form-dialog-component/solicitud-form-dialog-component';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { DetalleSolicitudDialogComponent } from '../detalle-solicitud-dialog-component/detalle-solicitud-dialog-component';
 import { EstudianteService } from '../../../core/services/estudiante.service';
+import { CatalogoService } from '../../../core/services/catalogo.service';
+import { EstadoSolicitud, TipoApoyo } from '../../../core/models/general.models';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-lista-solicitudes-component',
@@ -23,14 +27,15 @@ import { EstudianteService } from '../../../core/services/estudiante.service';
     CommonModule,
     FormsModule,
     MatTableModule,
+    MatPaginatorModule,
     MatFormFieldModule,
-    MatInputModule,
     MatSelectModule,
+    MatInputModule,
     MatButtonModule,
     MatIconModule,
-    MatDialogModule,
-    MatTooltipModule,
-    MatSnackBarModule
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatDialogModule
   ],
   templateUrl: './lista-solicitudes-component.html',
   styleUrl: './lista-solicitudes-component.css',
@@ -39,31 +44,64 @@ export class ListaSolicitudesComponent implements OnInit{
 
 
   private solicitudesService = inject(SolicitudesService);
+  private catalogoService = inject(CatalogoService);
   private estudianteService = inject(EstudianteService);
   public authService = inject(AuthService); 
   private dialog = inject(MatDialog);
-  private snackBar = inject(MatSnackBar);
-
+  
   // Columnas a visibilizar en la tabla
   displayedColumns: string[] = ['estudiante', 'tipoApoyo', 'monto', 'fecha', 'estado', 'acciones'];
   dataSource = signal<Solicitud[]>([]);
 
+  tiposApoyo = signal<TipoApoyo[]>([]);
+  estados = signal<TipoApoyo[]>([]);
+
   // Signals para los filtros de búsqueda y selección
-  estadoSeleccionado = signal<number | null>(null);
   tipoApoyoSeleccionado = signal<number | null>(null);
+  fechaSeleccionada = signal<Date | null>(null);
+  estadoSeleccionado = signal<number | null>(null);
   busqueda = signal<string>('');
 
+  totalRegistros = signal<number>(0);
+  paginaActual = signal<number>(0);
+  tamanoPagina = signal<number>(5);
+  opcionesTamanoPagina = [5, 10, 20, 50];
+
   ngOnInit(): void {
+    this.cargarCatalogos();
     this.cargarSolicitudes();
   }
 
-  
+  private cargarCatalogos(): void {
+    this.catalogoService.obtenerTiposApoyo().subscribe({
+      next: (tipos) => this.tiposApoyo.set(tipos),
+      error: (err) => console.error('Error cargando tipos de apoyo', err)
+    });
+
+    this.catalogoService.obtenerEstadosSolicitud().subscribe({
+      next: (estados) => this.estados.set(estados),
+      error: (err) => console.error('Error cargando estados de solicitud', err)
+    });
+  }
   cargarSolicitudes(): void {    
     if(this.authService.esAsesor()) {
-      this.solicitudesService.obtenerSolicitudes().subscribe({
-        next: (data) => this.dataSource.set(data),
-        error: (err) => console.error('Error al cargar la lista de solicitudes:', err)
-      });
+      const fechaFormateada = this.fechaSeleccionada() 
+        ? this.fechaSeleccionada()!.toISOString().split('T')[0] 
+      :null;
+      const filtro: FiltroSolicitud = {
+        tipoApoyoId: this.tipoApoyoSeleccionado(),
+        fecha: fechaFormateada,
+        estadoId: this.estadoSeleccionado(),
+        pagina: this.paginaActual() + 1,
+        tamanoPagina: this.tamanoPagina()        
+      }
+      this.solicitudesService.filtrarSolicitudes(filtro).subscribe({
+        next: (respuesta) => {
+          this.dataSource.set(respuesta.elementos);
+          this.totalRegistros.set(respuesta.totalRegistros);
+        },
+        error: (err) => console.error('Error al cargar solicitudes:', err)
+      });      
     }
     else{
       this.estudianteService.obtenerSolicitudesXEstudiante(this.authService.getUserId()!).subscribe({
@@ -77,9 +115,25 @@ export class ListaSolicitudesComponent implements OnInit{
     this.cargarSolicitudes();
   }
 
-  abrirModalCrear(): void {
-    if (!this.authService.esAsesor()) return;
+  aplicarFiltros(): void {
+    this.paginaActual.set(0);
+    this.cargarSolicitudes();
+  }
 
+  limpiarFiltros(): void {
+    this.tipoApoyoSeleccionado.set(null);
+    this.fechaSeleccionada.set(null);
+    this.estadoSeleccionado.set(null);
+    this.aplicarFiltros();
+  }
+
+  cambiarPagina(event: PageEvent): void {
+    this.paginaActual.set(event.pageIndex);
+    this.tamanoPagina.set(event.pageSize);
+    this.cargarSolicitudes();
+  }
+
+  abrirModalCrear(): void {    
     const dialogRef = this.dialog.open(SolicitudFormDialogComponent, {
       width: '600px',
       disableClose: true
@@ -89,11 +143,23 @@ export class ListaSolicitudesComponent implements OnInit{
       if (dtoResult) {
         // Invoca el endpoint de guardado POST /api/solicitudes
         this.solicitudesService.crearSolicitud(dtoResult).subscribe({
-          next: () => { 
-            this.snackBar.open('Solicitud registrada correctamente', 'OK', { duration: 2500 });
+          next: () => {
+            Swal.fire({
+              icon:'success',              
+              text: `Solicitud registrada correctamente`,
+              timer: 2500
+            });                
             this.cargarSolicitudes(); 
           },
-          error: (err) => console.error('Error al registrar la solicitud:', err)
+          error: (err) => {
+                console.error('Error al registrar la solicitud:', err);
+                Swal.fire({
+                      title: 'Error',
+                      text: 'Error al registrar la solicitud',
+                      timer: 3000,
+                      icon: 'error'
+                }) 
+          }
         });
       }
     });
@@ -101,15 +167,46 @@ export class ListaSolicitudesComponent implements OnInit{
 
   cambiarEstado(solicitudId: string, nuevoEstadoId: number): void {
     if (!this.authService.esAsesor()) return;
+    let verbo = '';
+    switch(nuevoEstadoId){
+      case 2: verbo = 'avanzar en'; break;
+      case 3: verbo = 'aprobar'; break;
+      case 4: verbo = 'rechazar'; break;
+    }
+    //let usuarioId = this.authService.getUserId()!;
+    Swal.fire({
+      title: "¿Está seguro de " + verbo + " la solicitud?",
+      text: "Esta acción no se puede revertir",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: "No"
+    }).then((result) =>{
+      if(result.isConfirmed){
+        this.aplicarCambioEstado(solicitudId,nuevoEstadoId)
+      }
+    });    
+  }
+
+  private aplicarCambioEstado(solicitudId: string, nuevoEstadoId: number){
     let usuarioId = this.authService.getUserId()!;
     this.solicitudesService.cambiarEstadoSolicitud(solicitudId, nuevoEstadoId, usuarioId).subscribe({
-      next: () => {
-        this.snackBar.open('Estado actualizado correctamente', 'OK', { duration: 2500 });
-        this.cargarSolicitudes(); // Recarga y refresca la tabla al instante
+      next: () => {        
+        Swal.fire({
+          icon:'success',              
+          text: `Estado actualizado correctamente`,
+          timer: 2500
+        });
+        this.cargarSolicitudes();
       },
       error: (err) => {
         console.error('Error al cambiar el estado:', err);
-        this.snackBar.open('Error al actualizar el estado de la solicitud', 'Cerrar', { duration: 3000 });
+        Swal.fire({
+              title: 'Error',
+              text: 'Error al actualizar el estado de la solicitud',
+              timer: 3000,
+              icon: 'error'
+        });        
       }
     });
   }
@@ -117,7 +214,7 @@ export class ListaSolicitudesComponent implements OnInit{
   verDetalle(solicitud: Solicitud): void {
     this.dialog.open(DetalleSolicitudDialogComponent, {
       width: '500px',
-      data: solicitud // Inyectamos toda la data de la fila al modal
+      data: solicitud
     });
   }
 

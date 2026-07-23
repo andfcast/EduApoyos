@@ -1,6 +1,8 @@
 ﻿using EduApoyosBackend.Application.DTOs;
 using EduApoyosBackend.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,6 +10,7 @@ namespace EduApoyosBackend.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SolicitudesController : ControllerBase
     {
         private readonly ISolicitudService _service;
@@ -19,24 +22,26 @@ namespace EduApoyosBackend.API.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// GET /api/solicitudes
+        /// Parámetros en query string: tipoApoyoId, fecha, estadoId, pagina, tamanoPagina
+        /// Ejemplo: /api/solicitudes?tipoApoyoId=1&estadoId=2&pagina=1&tamanoPagina=5
+        /// </summary>
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<SolicitudApoyoDto>))]
-        public async Task<IActionResult> Get()
+        [Authorize(Roles = "Asesor")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RespuestaPaginadaDto<SolicitudApoyoDto>))]
+        public async Task<ActionResult<RespuestaPaginadaDto<SolicitudApoyoDto>>> GetSolicitudes([FromQuery] FiltroSolicitudDto filtro)
         {
             _logger.LogInformation("Intentando obtener las solicitudes");
-            var result = await _service.ObtenerSolicitudesAsync();
-            return Ok(result);
+            var resultado = await _service.ObtenerSolicitudesFiltradasAsync(filtro);
+            return Ok(resultado);
         }
 
-        // GET api/<SolicitudesController>/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(Guid id)
-        {
-            var result = await _service.ObtenerSolicitudAsync(id);
-            return Ok(result);
-        }
-
-        // POST api/<SolicitudesController>
+        /// <summary>
+        /// Registro de nuevas solicitudes
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] RegistroSolicitudDto dto)
         {
@@ -45,7 +50,14 @@ namespace EduApoyosBackend.API.Controllers
             var resultado = await _service.RegistrarSolicitudAsync(dto);
             return NoContent();
         }
-                
+
+        /// <summary>
+        /// Cambia el estado de una solicitud
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "Asesor")]
         [HttpPatch("{id}/estado")]
         public async Task<IActionResult> Patch(Guid id, [FromBody] ActualizarEstadoSolicitudDto dto)
         {

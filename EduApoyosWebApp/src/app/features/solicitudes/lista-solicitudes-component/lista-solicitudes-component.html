@@ -4,44 +4,58 @@
     <p>Revisión, dictamen y registro de solicitudes académicas y socioeconómicas</p>
   </div>
 
-  <!-- 🔒 Botón de creación exclusivo para el Asesor -->
-  @if (authService.esAsesor()) {
+  
     <button mat-raised-button color="primary" (click)="abrirModalCrear()">
       <mat-icon>add_circle</mat-icon> Nueva Solicitud
     </button>
-  }
+  
 </div>
 
 <div class="table-container mat-elevation-z2">
   <!-- Barra de Filtros -->
+  @if(authService.esAsesor()){
   <div class="filter-header">
-    <mat-form-field appearance="outline" class="search-field">
-      <mat-label>Buscar por estudiante o documento</mat-label>
-      <input matInput [(ngModel)]="busqueda" (ngModelChange)="onFiltroChange()" placeholder="Escriba un nombre...">
-      <mat-icon matSuffix>search</mat-icon>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Estado</mat-label>
-      <mat-select [(ngModel)]="estadoSeleccionado" (selectionChange)="onFiltroChange()">
-        <mat-option [value]="null">Todos los estados</mat-option>
-        <mat-option [value]="1">Pendiente</mat-option>
-        <mat-option [value]="2">Aprobada</mat-option>
-        <mat-option [value]="3">Rechazada</mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" class="filtro-field">
       <mat-label>Tipo de Apoyo</mat-label>
-      <mat-select [(ngModel)]="tipoApoyoSeleccionado" (selectionChange)="onFiltroChange()">
-        <mat-option [value]="null">Todos los tipos</mat-option>
-        <mat-option [value]="1">Alimentario</mat-option>
-        <mat-option [value]="2">Transporte</mat-option>
-        <mat-option [value]="3">Tecnológico</mat-option>
-        <mat-option [value]="4">Matrícula</mat-option>
+      <mat-select [ngModel]="tipoApoyoSeleccionado()" (ngModelChange)="tipoApoyoSeleccionado.set($event)">
+        <mat-option [value]="null">Todos</mat-option>        
+        @for (tipo of tiposApoyo(); track tipo.id) {
+          <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filtro-field">
+      <mat-label>Estado</mat-label>
+      <mat-select [ngModel]="estadoSeleccionado()" (ngModelChange)="estadoSeleccionado.set($event)">
+        <mat-option [value]="null">Todos</mat-option>        
+        @for (estado of estados(); track estado.id) {
+          <mat-option [value]="estado.id">{{ estado.nombre }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filtro-field">
+      <mat-label>Fecha de Solicitud</mat-label>
+      <input matInput [matDatepicker]="picker" [ngModel]="fechaSeleccionada()" (ngModelChange)="fechaSeleccionada.set($event)">
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+    
+    <div class="filtros-acciones">
+      
+      <button mat-raised-button color="primary" (click)="aplicarFiltros()">
+        <mat-icon>filter_list</mat-icon> Filtrar
+      </button>
+
+      <!-- Botón Limpiar (Usa mat-stroked-button para que tenga un borde limpio y sutil) -->
+      <button mat-stroked-button (click)="limpiarFiltros()">
+        <mat-icon>clear</mat-icon> Limpiar
+      </button>
+    </div>
+
   </div>
+}
 
   <!-- Tabla de Solicitudes -->
   <table mat-table [dataSource]="dataSource()">
@@ -86,55 +100,68 @@
     <!-- Acciones -->
     <ng-container matColumnDef="acciones">
   <th mat-header-cell *matHeaderCellDef> Acciones </th>
-  <td mat-cell *matCellDef="let element">
+  <td mat-cell *matCellDef="let element">    
+    <!-- Contenedor Flex para alinear todo en horizontal -->
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;">
+      
+      <!-- Botón Ver Detalle -->
       <button mat-icon-button 
               color="primary" 
               (click)="verDetalle(element)" 
               matTooltip="Ver detalle">
         <mat-icon>visibility</mat-icon>
       </button>
-    @if (authService.esAsesor()) {
 
-      <!-- ESTADO: PENDIENTE (1) -> Botón 'En Revisión' -->
-      @if (element.estado === 'Pendiente') {
-        <button mat-flat-button 
-                color="accent" 
-                class="btn-accion" 
-                (click)="cambiarEstado(element.id, 2)">
-          <mat-icon>rate_review</mat-icon> Pasar a Revisión
-        </button>
-      }
+      @if (authService.esAsesor()) {
 
-      <!-- ESTADO: EN REVISIÓN (2) -> Botones 'Aprobar' y 'Rechazar' -->
-      @else if (element.estado === 'En Revisión') {
-        <div class="btn-group">
+        <!-- ESTADO: PENDIENTE (1) -> Botón 'En Revisión' -->
+        @if (element.estado === 'Pendiente') {
+          <button mat-flat-button 
+                  color="accent" 
+                  class="btn-accion" 
+                  (click)="cambiarEstado(element.id, 2)">
+            <mat-icon>rate_review</mat-icon> Pasar a Revisión
+          </button>
+        }
+
+        <!-- ESTADO: EN REVISIÓN (2) -> Botones 'Aprobar' y 'Rechazar' -->
+        @else if (element.estado === 'En Revisión') {
           <button mat-flat-button 
                   class="btn-aprobar" 
                   (click)="cambiarEstado(element.id, 3)">
             <mat-icon>check_circle</mat-icon> Aprobar
           </button>
 
-          <button mat-flat-button 
-                  color="warn" 
-                  class="btn-accion" 
+          <button mat-flat-button                 
+                  class="btn-rechazar" 
                   (click)="cambiarEstado(element.id, 4)">
             <mat-icon>cancel</mat-icon> Rechazar
           </button>
-        </div>
+        }
+
+        <!-- ESTADOS FINALES: APROBADA (3) O RECHAZADA (4) -->
+        @else {
+          <span class="text-muted" style="display: flex; align-items: center; gap: 4px;">
+            <mat-icon class="icon-done">done_all</mat-icon> Finalizada
+          </span>
+        }
+
+      } @else {
+        <span class="text-muted">Solo lectura</span>
       }
 
-      <!-- ESTADOS FINALES: APROBADA (3) O RECHAZADA (4) -> No muestra acciones -->
-      @else {
-        <span class="text-muted"><mat-icon class="icon-done">done_all</mat-icon> Finalizada</span>
-      }
-
-    } @else {
-      <span class="text-muted">Solo lectura</span>
-    }
+    </div>
   </td>
 </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
+  <mat-paginator [length]="totalRegistros()"
+                   [pageSize]="tamanoPagina()"
+                   [pageIndex]="paginaActual()"
+                   [pageSizeOptions]="opcionesTamanoPagina"
+                   (page)="cambiarPagina($event)"
+                   showFirstLastButtons>
+    </mat-paginator>
 </div>

@@ -23,5 +23,6 @@ namespace EduApoyosBackend.Domain.Repositories
         Task AgregarAsync(T entity);
         void Actualizar(T entity);
         void Borrar(T entity);
+        IQueryable<T> Query();
     }
 }

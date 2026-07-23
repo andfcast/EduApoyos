@@ -8,11 +8,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
+
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login-component',
@@ -23,8 +24,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
-    MatButtonModule,
-    MatSnackBarModule,
+    MatButtonModule,    
     MatProgressSpinnerModule
   ],
   templateUrl: './login-component.html',
@@ -34,8 +34,7 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
-  private snackBar = inject(MatSnackBar);
-
+  
   // Signals de estado
   isLoading = signal<boolean>(false);
   hidePassword = signal<boolean>(true);
@@ -59,14 +58,23 @@ export class LoginComponent {
 
     this.authService.login(this.loginForm.value).subscribe({
       next: (userSession) => {
-        this.isLoading.set(false);
-        this.snackBar.open(`¡Bienvenido, ${userSession.nombre}!`, 'Cerrar', { duration: 3000 });
-        // AuthService realiza el ruteo dinámico según el rol (Asesor o Estudiante)
+        this.isLoading.set(false);      
+        Swal.fire({
+          icon:'info',
+          title: '¡Bienvenido!',
+          text: `¡Bienvenido, ${userSession.nombre}!`,
+          timer: 3000
+        });
       },
       error: (err) => {
         this.isLoading.set(false);
-        const errorMsg = err.error?.message || err.error?.title || 'Credenciales inválidas o error en el servidor.';
-        this.snackBar.open(errorMsg, 'Cerrar', { duration: 4000 });
+        const errorMsg = err.error?.message || err.error?.title || 'Credenciales inválidas o error en el servidor.';        
+        Swal.fire({
+          title: 'Error',
+          text: errorMsg,
+          timer: 5000,
+          icon: 'error'
+        })
       }
     });
   }

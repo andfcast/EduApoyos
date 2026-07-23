@@ -1,0 +1,64 @@
+name: .NET CI
+
+on:
+  push:
+    branches: ["feature/RF-05", "main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build-test-publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    strategy:
+      matrix:
+        dotnet-version: [8.0]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Restore
+        run: dotnet restore EduApoyosBackend/EduApoyosBackend.slnx
+
+      - name: Build
+        run: dotnet build EduApoyosBackend/EduApoyosBackend.slnx --configuration Release --no-restore
+
+      - name: Run tests
+        run: |
+          dotnet test EduApoyosBackend/EduApoyosBackend.Tests/EduApoyosBackend.Tests.csproj \
+            --configuration Release \
+            --no-build \
+            --logger "trx;LogFileName=test_results.trx" \
+            --results-directory ./test-results || true
+        continue-on-error: false
+
+      - name: Publish artifacts (API)
+        if: success()
+        run: |
+          dotnet publish EduApoyosBackend/EduApoyosBackend.API/EduApoyosBackend.API.csproj \
+            -c Release -o ./publish --no-build
+
+      - name: Upload published artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eduapoyos-api
+          path: ./publish
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: ./test-results

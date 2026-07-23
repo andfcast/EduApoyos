@@ -19,6 +19,7 @@ namespace EduApoyosBackend.Tests
         private readonly Mock<IPasswordHasher> _hasherMock;
         private readonly Mock<ITokenService> _jwtProviderMock;
         private readonly Mock<IUsuarioRepository> _usuarioRepoMock;
+        private readonly Mock<IEstudianteRepository> _estudiantesRepoMock;
 
         private readonly UsuarioService _usuarioService;
 
@@ -28,9 +29,14 @@ namespace EduApoyosBackend.Tests
             _hasherMock = new Mock<IPasswordHasher>();
             _jwtProviderMock = new Mock<ITokenService>();
             _usuarioRepoMock = new Mock<IUsuarioRepository>();
+            _estudiantesRepoMock = new Mock<IEstudianteRepository>();
 
             // Configuramos el Unit of Work para que devuelva nuestros repositorios mockeados
             _uowMock.Setup(u => u.Usuarios).Returns(_usuarioRepoMock.Object);
+            _uowMock.Setup(u => u.Estudiantes).Returns(_estudiantesRepoMock.Object);
+
+            // Por defecto, los métodos asíncronos de repositorios devuelven tareas completadas
+            _estudiantesRepoMock.Setup(r => r.AgregarAsync(It.IsAny<Estudiante>())).Returns(Task.CompletedTask);
 
             _usuarioService = new UsuarioService(_uowMock.Object, _hasherMock.Object, _jwtProviderMock.Object);
         }
@@ -80,6 +86,5 @@ namespace EduApoyosBackend.Tests
             // Verificamos que NUNCA se intentó guardar nada
             _uowMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
-
     }
 }

@@ -36,15 +36,16 @@ namespace EduApoyosBackend.Application.Services
 
             await _unitOfWork.Usuarios.AgregarAsync(nuevoUsuario);
 
-            await _unitOfWork.SaveChangesAsync();
-
             //Si es estudiante, se crea preliminarmente, pero se puede editar posteriormente para agregar los datos faltantes, como el tipo de documento,
             //número de documento, programa académico y semestre.
-            if (dto.RolId == 2) { 
+            if (dto.RolId == 2) 
+            { 
                 var nuevoEstudiante = new Estudiante(Guid.NewGuid(), nuevoUsuario.Id,1,"",1,1);
                 await _unitOfWork.Estudiantes.AgregarAsync(nuevoEstudiante);
-                await _unitOfWork.SaveChangesAsync();
             }
+
+            // Guardamos los cambios una sola vez para que ambas inserciones se apliquen en la misma transacción
+            await _unitOfWork.SaveChangesAsync();
 
             return "Usuario registrado con éxito de manera segura.";
         }

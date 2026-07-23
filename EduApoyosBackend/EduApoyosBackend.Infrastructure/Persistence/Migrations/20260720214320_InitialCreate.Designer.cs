@@ -125,7 +125,7 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("SolicitudId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UsuarioId")
+                    b.Property<Guid?>("UsuarioId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");

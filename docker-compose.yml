@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: EduApoyosBackend/EduApoyosBackend.API/Dockerfile
+    image: eduapoyos-api:latest
+    ports:
+      - "8080:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      # Conexión a LocalDB del host via host.docker.internal.
+      # Nota: LocalDB normalmente usa named pipes; para conectar desde un contenedor
+      # debe exponerse TCP en el host o tener una instancia SQL Server escuchando en TCP.
+      # Ajusta el nombre de la instancia y el puerto si corresponde.
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal;Database=EduApoyos;User Id=sa;Password=Your_password123;TrustServerCertificate=True;
+    depends_on:
+      - db
+    restart: on-failure
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - SA_PASSWORD=Your_password123
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"Your_password123\" -Q \"SELECT 1\" > /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    restart: unless-stopped
+
+volumes:
+  mssql-data:
+    driver: local

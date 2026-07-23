@@ -12,5 +12,6 @@ namespace EduApoyosBackend.Application.Interfaces
         Task<string> RegistrarEstudianteAsync(RegistroEstudianteDto dto);
         Task<IEnumerable<EstudianteDto>> ObtenerEstudiantesAsync();
         Task<string> ActualizarEstudianteAsync(EdicionEstudianteDto dto);
+        Task<RespuestaPaginadaDto<EstudianteDto>> ObtenerEstudiantesPaginadosAsync(string? busqueda, int pagina, int tamanoPagina);
     }
 }

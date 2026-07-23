@@ -2,6 +2,7 @@
 using EduApoyosBackend.Application.Interfaces;
 using EduApoyosBackend.Domain.Entities;
 using EduApoyosBackend.Domain.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,6 +44,55 @@ namespace EduApoyosBackend.Application.Services
                 Semestre = e.Semestre,
                 Activo = e.Activo
             });
+        }
+
+        public async Task<RespuestaPaginadaDto<EstudianteDto>> ObtenerEstudiantesPaginadosAsync(string? busqueda, int pagina = 1, int tamanoPagina = 10) {
+            var query = _unitOfWork.Estudiantes.Query()
+            .Include(e => e.Usuario)
+            .AsNoTracking();
+
+            // 2. Aplicar filtro por búsqueda si viene texto
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                var termino = busqueda.Trim().ToLower();
+
+                query = query.Where(e =>
+                    e.Usuario.NombreCompleto.ToLower().Contains(termino) ||
+                    e.Usuario.Email.ToLower().Contains(termino) ||
+                    e.NumeroDocumento.ToLower().Contains(termino) ||
+                    e.ProgramaAcademico.Descripcion.ToLower().Contains(termino));
+            }
+
+            // 3. Contar el total de registros filtrados (COUNT en SQL)
+            var totalRegistros = await query.CountAsync();
+
+            // 4. Normalizar parámetros de paginación
+            var paginaValida = pagina < 1 ? 1 : pagina;
+            var tamanoValido = tamanoPagina < 1 ? 10 : tamanoPagina;
+
+            // 5. Paginar y mapear a DTO (SKIP / TAKE en SQL)
+            var elementos = await query
+                .OrderBy(e => e.Usuario.NombreCompleto)
+                .Skip((paginaValida - 1) * tamanoValido)
+                .Take(tamanoValido)
+                .Select(e => new EstudianteDto
+                {
+                    Id = e.Id,
+                    NumeroDocumento = e.NumeroDocumento,
+                    NombreCompleto = e.Usuario.NombreCompleto,
+                    Email = e.Usuario.Email,
+                    ProgramaAcademico = e.ProgramaAcademico.Descripcion,
+                    Semestre = e.Semestre,
+                    Activo = e.Activo
+                })
+                .ToListAsync();
+
+            return new RespuestaPaginadaDto<EstudianteDto>
+            {
+                Elementos = elementos,
+                TotalRegistros = totalRegistros,
+                PaginaActual = paginaValida,                
+            };
         }
 
         public async Task<string> RegistrarEstudianteAsync(RegistroEstudianteDto dto)
