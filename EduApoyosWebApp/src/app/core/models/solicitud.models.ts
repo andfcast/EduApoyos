@@ -31,7 +31,7 @@ export interface HistorialEstadoSolicitud {
     id: string;
     solicitudId: string;
     estadoAnterior: string;
-    estadoNuevo: string;
+    estadoSiguiente: string;
     fechaCambio: Date;
     observacion: string;
 }

@@ -26,8 +26,7 @@ namespace EduApoyosBackend.API.Controllers
         /// Login del usuario
         /// </summary>
         /// <param name="dto"></param>
-        /// <returns></returns>
-        [AllowAnonymous]
+        /// <returns></returns>        
         // POST api/<AuthController>
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
@@ -44,7 +43,6 @@ namespace EduApoyosBackend.API.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [AllowAnonymous]
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] RegistroUsuarioDto dto)
         {

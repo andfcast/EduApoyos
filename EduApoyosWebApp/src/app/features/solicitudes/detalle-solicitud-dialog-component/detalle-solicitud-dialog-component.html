@@ -40,6 +40,42 @@
         </div>
         
       </div>
+
+      <h3>Historial de Solicitud</h3>
+
+      @if (data.historialEstados && data.historialEstados.length > 0) {
+        <table mat-table [dataSource]="data.historialEstados" class="mat-elevation-z1 tabla-historial">
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef> Fecha / Hora </th>
+            <td mat-cell *matCellDef="let item"> {{ item.fechaCambio | date:'dd/MM/yyyy HH:mm' }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="estadoAnterior">
+            <th mat-header-cell *matHeaderCellDef> Estado Anterior </th>
+            <td mat-cell *matCellDef="let item"> 
+              {{ item.nombreEstadoAnterior || item.estadoAnterior || '—' }} 
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="estadoNuevo">
+            <th mat-header-cell *matHeaderCellDef> Nuevo Estado </th>
+            <td mat-cell *matCellDef="let item"> 
+              <strong>{{ item.nombreEstadoNuevo || item.estadoSiguiente }}</strong>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="observacion">
+            <th mat-header-cell *matHeaderCellDef> Observación </th>
+            <td mat-cell *matCellDef="let item"> {{ item.observacion || 'Sin observaciones' }} </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="columnasHistorial"></tr>
+          <tr mat-row *matRowDef="let row; columns: columnasHistorial;"></tr>
+        </table>
+      } @else {
+        <p class="sin-registros">No hay registros de historial disponibles para esta solicitud.</p>
+      }
+
     </mat-dialog-content>
 
     <mat-dialog-actions align="end" class="dialog-actions">

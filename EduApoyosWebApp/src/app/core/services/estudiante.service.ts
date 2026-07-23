@@ -22,9 +22,12 @@ export class EstudianteService {
   }
 
   obtenerTodosCombo(): Observable<EstudianteCombo[]> {
-    return this.http.get<Estudiante[]>(this.apiUrl).pipe(
-      map((estudiantes: Estudiante[]): EstudianteCombo[] =>
-        estudiantes.map((estudiante): EstudianteCombo => ({
+    let params = new HttpParams()
+      .set('pagina', '1')
+      .set('tamanoPagina','1000');
+    return this.http.get<RespuestaPaginada<Estudiante>>(`${this.apiUrl}`, { params }).pipe(
+      map((estudiantes: RespuestaPaginada<Estudiante>): EstudianteCombo[] =>
+        estudiantes.elementos.map((estudiante): EstudianteCombo => ({
           id: estudiante.id,
           nombreCompleto: estudiante.nombreCompleto
         }))
