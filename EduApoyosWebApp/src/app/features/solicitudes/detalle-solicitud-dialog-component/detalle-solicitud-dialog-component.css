@@ -1,41 +1,60 @@
 .dialog-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0;
-    }
-    .detalle-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      margin-top: 10px;
-    }
-    .detalle-item {
-      display: flex;
-      flex-direction: column;
-      
-      strong { color: #333; margin-bottom: 4px; font-size: 0.9rem; }
-      span { color: #555; font-size: 1rem; }
-    }
-    .mt-2 { margin-top: 16px; }
-    .observaciones-texto {
-      background-color: #f5f5f5;
-      padding: 12px;
-      border-radius: 4px;
-      margin: 0;
-      color: #444;
-      font-style: italic;
-    }
-    /* Reutilizamos las clases de los badges */
-    .status-badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      width: max-content;
-    }
-    .pendiente { background-color: #fff3cd; color: #856404; }
-    .en-revision { background-color: #cce5ff; color: #004085; }
-    .aprobada { background-color: #d4edda; color: #155724; }
-    .rechazada { background-color: #f8d7da; color: #721c24; }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0;
+}
+.detalle-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 10px;
+}
+.detalle-item {
+  display: flex;
+  flex-direction: column;
+  
+  strong { color: #333; margin-bottom: 4px; font-size: 0.9rem; }
+  span { color: #555; font-size: 1rem; }
+}
+.mt-2 { margin-top: 16px; }
+.observaciones-texto {
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 4px;
+  margin: 0;
+  color: #444;
+  font-style: italic;
+}
+/* Reutilizamos las clases de los badges */
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  width: max-content;
+}
+
+.tabla-historial {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.tabla-historial th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+.sin-registros {
+  font-style: italic;
+  color: #777;
+  padding: 10px 0;
+}
+
+.pendiente { background-color: #fff3cd; color: #856404; }
+.en-revision { background-color: #cce5ff; color: #004085; }
+.aprobada { background-color: #d4edda; color: #155724; }
+.rechazada { background-color: #f8d7da; color: #721c24; }

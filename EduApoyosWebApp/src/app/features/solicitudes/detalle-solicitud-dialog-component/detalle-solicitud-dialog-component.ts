@@ -6,12 +6,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { Solicitud } from '../../../core/models/solicitud.models';
 import { PdfSolicitudService } from '../../../core/services/pdf.service';
+import { MatTableModule } from '@angular/material/table';
 
 @Component({
   selector: 'app-detalle-solicitud-dialog-component',
   imports: [
     CommonModule, 
     MatDialogModule, 
+    MatTableModule,
     MatButtonModule, 
     MatIconModule, 
     MatDividerModule],
@@ -19,6 +21,7 @@ import { PdfSolicitudService } from '../../../core/services/pdf.service';
   styleUrl: './detalle-solicitud-dialog-component.css',
 })
 export class DetalleSolicitudDialogComponent {
+  columnasHistorial: string[] = ['fecha', 'estadoAnterior', 'estadoNuevo', 'observacion'];
   private pdfService = inject(PdfSolicitudService);
   constructor(
     public dialogRef: MatDialogRef<DetalleSolicitudDialogComponent>,
