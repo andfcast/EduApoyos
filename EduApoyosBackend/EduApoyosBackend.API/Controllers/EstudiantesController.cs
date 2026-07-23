@@ -31,13 +31,11 @@ namespace EduApoyosBackend.API.Controllers
         [HttpGet]
         [Authorize(Roles = "Asesor")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<EstudianteDto>))]
-        public async Task<IActionResult> Get()
-        {
-            var result = await _service.ObtenerEstudiantesAsync();
+        public async Task<IActionResult> Get([FromQuery] string? busqueda, [FromQuery] int pagina = 1, [FromQuery] int tamanoPagina = 10) {
+            var result = await _service.ObtenerEstudiantesPaginadosAsync(busqueda,pagina,tamanoPagina);
             return Ok(result);
         }
         
-
         /// <summary>
         /// Ingreso de estudiantes
         /// </summary>

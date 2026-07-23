@@ -63,7 +63,7 @@ export class ListaSolicitudesComponent implements OnInit{
   busqueda = signal<string>('');
 
   totalRegistros = signal<number>(0);
-  paginaActual = signal<number>(0); // 0-based index para MatPaginator
+  paginaActual = signal<number>(0);
   tamanoPagina = signal<number>(5);
   opcionesTamanoPagina = [5, 10, 20, 50];
 

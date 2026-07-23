@@ -3,7 +3,10 @@ using EduApoyosBackend.Application.Interfaces;
 using EduApoyosBackend.Application.Services;
 using EduApoyosBackend.Domain.Entities;
 using EduApoyosBackend.Domain.Repositories;
+using EduApoyosBackend.Infrastructure.Persistence;
+using EduApoyosBackend.Infrastructure.Persistence.Context;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -36,6 +39,104 @@ namespace EduApoyosBackend.Tests
             _uowMock.Setup(u => u.Estudiantes).Returns(_estudianteRepoMock.Object);
 
             _estudianteService = new EstudianteService(_uowMock.Object, _hasherMock.Object, _jwtProviderMock.Object);
+        }
+
+        private DbContextOptions<AppDbContext> CrearOpcionesBaseDatosMemoria()
+        {
+            return new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+        }
+
+        [Fact]
+        public async Task ObtenerEstudiantesPaginadosAsync_DeberiaFiltrarYPaginarCorrectamente()
+        {
+            var options = CrearOpcionesBaseDatosMemoria();
+
+            using (var contextArrange = new AppDbContext(options))
+            {
+                // 1. Crear e insertar programas académicos (Catálogos)
+                var programa1 = new ProgramaAcademico(1, "Ingeniería de Sistemas");
+                var programa2 = new ProgramaAcademico(2, "Medicina");
+                await contextArrange.ProgramasAcademicos.AddRangeAsync(programa1, programa2);
+
+                // 2. Crear e insertar usuarios
+                var usuario1 = new Usuario(Guid.NewGuid(), "Carlos Pérez", "carlos@edu.co", "hash", 2, DateTime.UtcNow);
+                var usuario2 = new Usuario(Guid.NewGuid(), "Ana María Gómez", "ana@edu.co", "hash", 2, DateTime.UtcNow);
+                var usuario3 = new Usuario(Guid.NewGuid(), "Carlos Rodríguez", "crodriguez@edu.co", "hash", 2, DateTime.UtcNow);
+                await contextArrange.Usuarios.AddRangeAsync(usuario1, usuario2, usuario3);
+
+                // 3. Crear estudiantes usando las FKs (1 para Sistemas, 2 para Medicina) sin reasignar la propiedad de navegación
+                var estudiante1 = new Estudiante(Guid.NewGuid(), usuario1.Id, tipoDocumentoId: 1, "101010", programaAcademicoId: 1, semestre: 3);
+                var estudiante2 = new Estudiante(Guid.NewGuid(), usuario2.Id, tipoDocumentoId: 2, "202020", programaAcademicoId: 1, semestre: 5);
+                var estudiante3 = new Estudiante(Guid.NewGuid(), usuario3.Id, tipoDocumentoId: 1, "303030", programaAcademicoId: 1, semestre: 2);
+
+                await contextArrange.Estudiantes.AddRangeAsync(estudiante1, estudiante2, estudiante3);
+
+                // Guardar todos los cambios de una sola vez
+                await contextArrange.SaveChangesAsync();
+            }
+
+            // 2. Act & Assert en un contexto limpio (Act)
+            using (var contextAct = new AppDbContext(options))
+            {
+                var unitOfWork = new UnitOfWork(contextAct);
+                var servicio = new EstudianteService(unitOfWork, _hasherMock.Object, _jwtProviderMock.Object);
+
+                // Búsqueda por "Carlos" (debería encontrar a Carlos Pérez y Carlos Rodríguez -> 2 registros)
+                // Página 1, tamaño 1 -> Debe retornar sólo 1 registro pero con TotalRegistros = 2
+                var resultado = await servicio.ObtenerEstudiantesPaginadosAsync(
+                    busqueda: "carlos",
+                    pagina: 1,
+                    tamanoPagina: 1);
+
+                // Assert
+                resultado.Should().NotBeNull();
+                resultado.TotalRegistros.Should().Be(2); // Total filtrado por "Carlos"
+                resultado.PaginaActual.Should().Be(1);
+                resultado.Elementos.Should().HaveCount(1);
+
+                // Como los ordena por NombreCompleto: "Carlos Pérez" va antes que "Carlos Rodríguez"
+                resultado.Elementos.First().NombreCompleto.Should().Be("Carlos Pérez");
+            }
+        }
+
+        [Fact]
+        public async Task ObtenerEstudiantesPaginadosAsync_SinFiltro_DeberiaRetornarTodosPaginados()
+        {
+            // Arrange
+            var options = CrearOpcionesBaseDatosMemoria();
+
+            using (var contextArrange = new AppDbContext(options))
+            {
+                var usuario1 = new Usuario(Guid.NewGuid(), "Estudiante A", "a@edu.co", "hash", 2, DateTime.UtcNow);
+                var usuario2 = new Usuario(Guid.NewGuid(), "Estudiante B", "b@edu.co", "hash", 2, DateTime.UtcNow);
+                await contextArrange.Usuarios.AddRangeAsync(usuario1, usuario2);
+
+                var programa = new ProgramaAcademico(3, "Derecho");
+                await contextArrange.ProgramasAcademicos.AddAsync(programa);
+
+                var estudiante1 = new Estudiante(Guid.NewGuid(), usuario1.Id, 1, "1111", 3, 1);
+                var estudiante2 = new Estudiante(Guid.NewGuid(), usuario2.Id, 1, "2222", 3, 1);
+
+                await contextArrange.Estudiantes.AddRangeAsync(estudiante1, estudiante2);
+                await contextArrange.SaveChangesAsync();
+            }
+
+            // Act & Assert
+            using (var contextAct = new AppDbContext(options))
+            {
+                var unitOfWork = new UnitOfWork(contextAct);
+                var servicio = new EstudianteService(unitOfWork, _hasherMock.Object, _jwtProviderMock.Object);
+                var resultado = await servicio.ObtenerEstudiantesPaginadosAsync(
+                    busqueda: null,
+                    pagina: 1,
+                    tamanoPagina: 10);
+
+                // Assert
+                resultado.TotalRegistros.Should().Be(2);
+                resultado.Elementos.Should().HaveCount(2);
+            }
         }
 
         [Fact]

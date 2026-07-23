@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { RegistroEstudiante, Estudiante, EstudianteCombo } from '../models/estudiante.models';
+import { RegistroEstudiante, Estudiante, EstudianteCombo, FiltroEstudiante } from '../models/estudiante.models';
 import { environment } from '../../../environments/environment';
 import { Solicitud } from '../models/solicitud.models';
+import { RespuestaPaginada } from '../models/general.models';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +30,19 @@ export class EstudianteService {
         }))
       )
     );
+  }
+
+  obtenerPaginado(busqueda: string = '', pagina: number = 1, tamanoPagina: number = 10): Observable<RespuestaPaginada<Estudiante>> {
+    
+    let params = new HttpParams()
+      .set('pagina', pagina.toString())
+      .set('tamanoPagina', tamanoPagina.toString());
+
+    if (busqueda.trim()) {
+      params = params.set('busqueda', busqueda.trim());
+    }
+
+    return this.http.get<RespuestaPaginada<Estudiante>>(`${this.apiUrl}`, { params });
   }
 
   obtenerSolicitudesXEstudiante(estudianteId: string): Observable<Solicitud[]> {    

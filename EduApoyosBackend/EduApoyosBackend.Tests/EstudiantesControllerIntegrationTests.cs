@@ -34,73 +34,104 @@ namespace EduApoyosBackend.Tests
         }
 
         [Fact]
-        public async Task Get_DeberiaRetornarOkYLista_CuandoUsuarioEsAsesor()
+        public async Task GetSolicitudes_DeberiaRetornarLista_CuandoEstudianteTieneSolicitudes()
         {
-            // Seed asesor y estudiante
+            // Arrange: sembrar datos necesarios
+            Guid usuarioId;
             Guid estudianteId;
-            var estudianteEmail = "integration.estudiante.get@edu.co";
+            var passwordPlain = "Password123*";
             using (var scope = _factory.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-                // Crear asesor
-                if (!db.Usuarios.Any(u => u.Email == "integration.asesor@edu.co"))
+                // Asegurar que exista el rol "Estudiante" (no duplicar si ya está)
+                if (!db.Roles.Any(r => r.Id == 1))
                 {
-                    var asesor = new Usuario(Guid.NewGuid(), "Asesor Integration", "integration.asesor@edu.co", BCrypt.Net.BCrypt.HashPassword("Password123*"), 1, DateTime.UtcNow);
-                    db.Usuarios.Add(asesor);
+                    db.Roles.Add(new Rol(1, "Asesor"));
+                }
+                if (!db.Roles.Any(r => r.Id == 2))
+                {
+                    db.Roles.Add(new Rol(2, "Estudiante"));
                 }
 
-                // Crear usuario estudiante y entidad Estudiante
-                if (!db.Usuarios.Any(u => u.Email == estudianteEmail))
+                // Asegurar que exista un tipo de apoyo con id 1
+                if (!db.TiposApoyo.Any(t => t.Id == 1))
                 {
-                    var usuarioEst = new Usuario(Guid.NewGuid(), "Estudiante Integration", estudianteEmail, BCrypt.Net.BCrypt.HashPassword("Password123*"), 2, DateTime.UtcNow);
-                    db.Usuarios.Add(usuarioEst);
-                    await db.SaveChangesAsync();
+                    db.TiposApoyo.Add(new TipoApoyo(1, "Económico", "Apoyo financiero mensual"));
+                }
 
-                    var progId = db.ProgramasAcademicos.Select(p => p.Id).First();
-                    var tipoDocId = db.TiposDocumento.Select(t => t.Id).First();
+                // Asegurar estado 1 (Pendiente) exista (OnModelCreating normalmente lo inserta)
+                if (!db.EstadosSolicitud.Any(e => e.Id == 1))
+                {
+                    db.EstadosSolicitud.Add(new EstadoSolicitud(1, "Pendiente", "Radicada"));
+                }
 
-                    var estudiante = new Estudiante(Guid.NewGuid(), usuarioEst.Id, tipoDocId, "123456789", progId, 1);
-                    estudianteId = estudiante.Id;
+                // Crear usuario de prueba si no existe
+                var email = "estudiante.integration@edu.co";
+                var existing = db.Usuarios.FirstOrDefault(u => u.Email == email);
+                Usuario usuario;
+                if (existing == null)
+                {
+                    usuario = new Usuario(Guid.NewGuid(), "Estudiante Test", email, BCrypt.Net.BCrypt.HashPassword(passwordPlain), 2, DateTime.UtcNow);
+                    db.Usuarios.Add(usuario);
+                }
+                else
+                {
+                    usuario = existing;
+                }
+                usuarioId = usuario.Id;
+                var emailAsesor = "asesor.integration@edu.co";
+                Usuario asesor = new Usuario(Guid.NewGuid(), "Asesor Test", emailAsesor, BCrypt.Net.BCrypt.HashPassword(passwordPlain), 1, DateTime.UtcNow);
+                db.Usuarios.Add(asesor);
+
+                // Crear estudiante si no existe
+                var existingEst = db.Estudiantes.FirstOrDefault(e => e.UsuarioId == usuarioId);
+                Estudiante estudiante;
+                if (existingEst == null)
+                {
+                    estudiante = new Estudiante(Guid.NewGuid(), usuarioId, 1, "00000000", 1, 1);
                     db.Estudiantes.Add(estudiante);
                 }
                 else
                 {
-                    var usuarioEst = db.Usuarios.First(u => u.Email == estudianteEmail);
-                    var est = db.Estudiantes.FirstOrDefault(e => e.UsuarioId == usuarioEst.Id);
-                    if (est == null)
-                    {
-                        var progId = db.ProgramasAcademicos.Select(p => p.Id).First();
-                        var tipoDocId = db.TiposDocumento.Select(t => t.Id).First();
-                        var estudiante = new Estudiante(Guid.NewGuid(), usuarioEst.Id, tipoDocId, "123456789", progId, 1);
-                        estudianteId = estudiante.Id;
-                        db.Estudiantes.Add(estudiante);
-                    }
-                    else
-                    {
-                        estudianteId = est.Id;
-                    }
+                    estudiante = existingEst;
+                }
+                estudianteId = estudiante.Id;
+
+                // Crear una solicitud ligada al estudiante (si ya existe una similar evitar duplicar)
+                if (!db.SolicitudesApoyo.Any(s => s.EstudianteId == estudianteId && s.Descripcion.Contains("Solicitud integración")))
+                {
+                    var solicitud = new SolicitudApoyo(Guid.NewGuid(), estudianteId, 1, 500.0, "Solicitud integración - prueba", 1, DateTime.UtcNow, DateTime.UtcNow, asesor.Id);
+                    db.SolicitudesApoyo.Add(solicitud);
+
+                    // Crear historial asociado
+                    var historial = new HistorialEstado(Guid.NewGuid(), solicitud.Id, null, solicitud.EstadoSolicitudId, DateTime.UtcNow, usuarioId, "Registro inicial - prueba integración");
+                    db.HistorialesEstados.Add(historial);
                 }
 
                 await db.SaveChangesAsync();
             }
 
-            // Login as asesor
-            var loginDto = new LoginDto { Email = "integration.asesor@edu.co", Password = "Password123*" };
+            // 1) Hacer login para obtener token (debe incluir rol "Estudiante")
+            var loginDto = new LoginDto { Email = "estudiante.integration@edu.co", Password = passwordPlain };
             var loginResponse = await _client.PostAsJsonAsync("/api/auth/login", loginDto);
+
             loginResponse.StatusCode.Should().Be(HttpStatusCode.OK);
             var loginResult = await loginResponse.Content.ReadFromJsonAsync<LoginResponseDto>();
-            loginResult.Should().NotBeNull();
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResult!.Token);
+            loginResult!.Token.Should().NotBeNullOrEmpty();
 
-            // Act
-            var response = await _client.GetAsync("/api/Estudiantes");
+            // 2) Llamar al endpoint protegido usando el token
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResult.Token);
+
+            // Nota: el servicio acepta tanto Estudiante.Id como Usuario.Id; se prueba con Usuario.Id
+            var response = await _client.GetAsync($"/api/estudiantes/{usuarioId}/solicitudes");
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            var estudiantes = await response.Content.ReadFromJsonAsync<EstudianteDto[]>();
-            estudiantes.Should().NotBeNull();
-            estudiantes!.Select(e => e.Email).Should().Contain(est => est == estudianteEmail);
+            var solicitudes = await response.Content.ReadFromJsonAsync<SolicitudApoyoDto[]>();
+            solicitudes.Should().NotBeNull();
+            solicitudes!.Length.Should().BeGreaterThanOrEqualTo(1);
+            solicitudes.Any(s => s.Descripcion.Contains("Solicitud integración")).Should().BeTrue();
         }
 
         [Fact]
