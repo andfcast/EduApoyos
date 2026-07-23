@@ -18,7 +18,10 @@ namespace EduApoyosBackend.API.Controllers
         {
             _service = service;
         }
-
+        /// <summary>
+        /// Obtiene el listado de programas académicos
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProgramaAcademicoDto>))]
         public async Task<IActionResult> Get()

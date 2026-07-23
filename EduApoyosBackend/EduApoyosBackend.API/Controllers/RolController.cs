@@ -19,6 +19,10 @@ namespace EduApoyosBackend.API.Controllers
             _service = service;
         }
 
+        /// <summary>
+        /// Obtiene el listado de roles
+        /// </summary>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<RolDto>))]

@@ -37,7 +37,11 @@ namespace EduApoyosBackend.API.Controllers
             return Ok(resultado);
         }
 
-        // POST api/<SolicitudesController>
+        /// <summary>
+        /// Registro de nuevas solicitudes
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] RegistroSolicitudDto dto)
         {
@@ -47,6 +51,12 @@ namespace EduApoyosBackend.API.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Cambia el estado de una solicitud
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [Authorize(Roles = "Asesor")]
         [HttpPatch("{id}/estado")]
         public async Task<IActionResult> Patch(Guid id, [FromBody] ActualizarEstadoSolicitudDto dto)

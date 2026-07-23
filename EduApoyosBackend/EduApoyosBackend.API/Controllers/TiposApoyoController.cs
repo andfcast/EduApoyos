@@ -19,6 +19,10 @@ namespace EduApoyosBackend.API.Controllers
             _service = service;
         }
 
+        /// <summary>
+        /// Obtiene el listado de Tipos de Apoyo
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TipoApoyoDto>))]
         public async Task<IActionResult> Get()

@@ -19,6 +19,10 @@ namespace EduApoyosBackend.API.Controllers
             _service = service;
         }
 
+        /// <summary>
+        /// Obtener los estados de la solicitud
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<EstadoSolicitudDto>))]
         public async Task<IActionResult> Get()

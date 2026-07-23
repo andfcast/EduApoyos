@@ -19,6 +19,10 @@ namespace EduApoyosBackend.API.Controllers
             _service = service;
         }
 
+        /// <summary>
+        /// Obtiene el listado de tipos de documento
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TipoDocumentoDto>))]
         public async Task<IActionResult> Get()
