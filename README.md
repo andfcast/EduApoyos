@@ -157,3 +157,10 @@ Para el despliegue y operación en producción de la plataforma **EduApoyos**, s
   * **Justificación:** 
     * Cumple con las buenas prácticas de seguridad (*Zero Trust* y OWASP) al evitar el almacenamiento de credenciales en código fuente o archivos `appsettings.json`.
     * Centraliza la custodia de la cadena de conexión a **Azure SQL Database**, los secretos del firmante de tokens **JWT** (`Jwt:Key`), la credencial de acceso a **Azure Blob Storage** y las claves del hash de passwords. Se integra de manera nativa y transparente con **Azure App Service** mediante *Managed Identities* (Identidades Administradas).
+
+# Pendientes
+Si tuviera el tiempo, me hubiera gustado implementar el manejo de archivos adjuntos con las solicitudes, así como haber ajustado mejor el docker-compose.yml.
+A la vez, me hubiera gustado tener otras funcionalidades extra como edición del perfil por parte del estudiante, y si hubiera sido posible, manejar un sistema de
+recordatorios con el listado de solicitudes con mayor tiempo sin ser atendidas.
+En gestión de solicitudes, me hubiera gustado implementar una lógica para manejo de tiempos de gestión de las Solicitudes
+Haber implementado la doble validación de campos contraseña en el módulo de registro de usuarios y creación/edición de estudiantes.
