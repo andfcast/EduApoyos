@@ -30,7 +30,7 @@ namespace EduApoyosBackend.Application.Services
                 MontoSolicitado = t.MontoSolicitado,
                 TipoApoyo = t.TipoApoyo.Nombre,
                 NombreEstudiante = t.Estudiante.Usuario.NombreCompleto,
-                NombreAsesor = t.Asesor.NombreCompleto,
+                NombreAsesor = t.Asesor!.NombreCompleto,
                 FechaActualizacion = t.FechaActualizacion,
                 HistorialEstados = t.HistorialEstados.Select(h => new HistorialEstadoDto
                 {
@@ -61,7 +61,7 @@ namespace EduApoyosBackend.Application.Services
                 MontoSolicitado = solicitud.MontoSolicitado,
                 TipoApoyo = solicitud.TipoApoyo.Nombre,
                 NombreEstudiante = solicitud.Estudiante.Usuario.NombreCompleto,
-                NombreAsesor = solicitud.Asesor.NombreCompleto,
+                NombreAsesor = solicitud.Asesor!.NombreCompleto,
                 FechaActualizacion = solicitud.FechaActualizacion,
                 HistorialEstados = solicitud.HistorialEstados.Select(h => new HistorialEstadoDto
                 {
@@ -117,7 +117,7 @@ namespace EduApoyosBackend.Application.Services
                     {
                         Id = h.Id,
                         SolicitudId = h.SolicitudId,
-                        EstadoAnterior = h.EstadoAnteriorId == null || h.EstadoAnteriorId == 0 ? string.Empty : h.EstadoAnterior.Nombre,
+                        EstadoAnterior = h.EstadoAnteriorId == null || h.EstadoAnteriorId == 0 ? string.Empty : h.EstadoAnterior!.Nombre,
                         EstadoSiguiente = h.EstadoNuevo.Nombre,
                         FechaCambio = h.FechaCambio,
                         Observacion = h.Observacion
@@ -129,8 +129,7 @@ namespace EduApoyosBackend.Application.Services
             {
                 Elementos = elementos,
                 TotalRegistros = totalRegistros,
-                PaginaActual = filtro.Pagina,
-                TotalPaginas = (int)Math.Ceiling((double)totalRegistros / filtro.TamanoPagina)
+                PaginaActual = filtro.Pagina
             };
         }
 
@@ -197,12 +196,8 @@ namespace EduApoyosBackend.Application.Services
         public async Task<IEnumerable<SolicitudApoyoDto>> ObtenerSolicitudesXEstudianteAsync(Guid id)
         {
             // Intentar obtener el estudiante por Id (el controlador pasa el Id del estudiante en la ruta).
-            var estudiante = await _unitOfWork.Estudiantes.ObtenerPorGuidAsync(id);
-            // Si no existe un estudiante con ese Id, intentar por UsuarioId para mantener compatibilidad hacia atrás.
-            if (estudiante == null)
-            {
-                estudiante = (await _unitOfWork.Estudiantes.BuscarAsync(x => x.UsuarioId == id)).FirstOrDefault();
-            }
+            // Buscar por Id o por UsuarioId para compatibilidad hacia atrás y evitar problemas con FindAsync/capturas
+            var estudiante = (await _unitOfWork.Estudiantes.BuscarAsync(x => x.Id == id || x.UsuarioId == id)).FirstOrDefault();
             if (estudiante == null)
                 return Enumerable.Empty<SolicitudApoyoDto>();
 
@@ -242,7 +237,7 @@ namespace EduApoyosBackend.Application.Services
                     FechaCambio = h.FechaCambio,
                     Observacion = h.Observacion
                 }).ToList() ?? new List<HistorialEstadoDto>()
-            });
+            }).ToList();
         }
     }
 }

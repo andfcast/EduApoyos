@@ -36,7 +36,6 @@ export class SolicitudesService {
       params = params.set('estadoId', filtro.estadoId.toString());
     }
 
-    // Realiza la petición GET /api/solicitudes?pagina=1&tamanoPagina=5&...
     return this.http.get<RespuestaPaginada<Solicitud>>(this.apiUrl, { params });
   }
 

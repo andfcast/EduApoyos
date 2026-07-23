@@ -11,6 +11,5 @@ namespace EduApoyosBackend.Application.DTOs
         public List<T> Elementos { get; set; } = new();
         public int TotalRegistros { get; set; }
         public int PaginaActual { get; set; }
-        public int TotalPaginas { get; set; }
     }
 }

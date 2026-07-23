@@ -96,7 +96,7 @@ namespace EduApoyosBackend.Tests
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         
             var resultado = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
-            resultado.Token.Should().NotBeNullOrEmpty();
+            resultado!.Token.Should().NotBeNullOrEmpty();
         }
     }
 }

@@ -29,7 +29,6 @@ namespace EduApoyosBackend.Tests
         public async Task GetSolicitudes_DeberiaRetornarOkYLista_CuandoUsuarioEsAsesor()
         {
             // Preparar datos: asesor, estudiante y solicitud
-            Guid solicitudId;
             var estudianteEmail = "integration.estudiante.solicitudes@edu.co";
             using (var scope = _factory.Services.CreateScope())
             {
