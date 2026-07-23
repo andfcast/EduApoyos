@@ -8,13 +8,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { RolService } from '../../../core/services/rol.service';
 import { Rol } from '../../../core/models/usuario.models';
 import { MatIconModule } from '@angular/material/icon';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-registrar-usuario-component',
@@ -26,8 +26,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule,
-    MatSnackBarModule,
+    MatButtonModule,    
     MatProgressSpinnerModule
   ],
   templateUrl: './registrar-usuario-component.html',
@@ -38,8 +37,7 @@ export class RegistrarUsuarioComponent implements OnInit {
   private usuarioService = inject(UsuarioService);
   private rolService = inject(RolService);
   private router = inject(Router);
-  private snackBar = inject(MatSnackBar);
-
+  
   roles = signal<Rol[]>([]);
   isLoading = signal<boolean>(false);
   hidePassword = signal<boolean>(true);
@@ -66,7 +64,12 @@ export class RegistrarUsuarioComponent implements OnInit {
     this.rolService.obtenerTodos().subscribe({
       next: (listaRoles) => this.roles.set(listaRoles),
       error: () => {
-        this.snackBar.open('Error al cargar la lista de roles desde el servidor.', 'Cerrar', { duration: 4000 });
+        Swal.fire({
+              title: 'Error',
+              text: 'Error al cargar la lista de roles desde el servidor.',
+              timer: 4000,
+              icon: 'error'
+        });          
       }
     });
   }
@@ -82,13 +85,22 @@ export class RegistrarUsuarioComponent implements OnInit {
     this.usuarioService.registrar(this.registerForm.value).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.snackBar.open('Usuario creado con éxito. Ya puedes iniciar sesión.', 'Ok', { duration: 4000 });
+        Swal.fire({
+            icon:'success',              
+            text: `Usuario creado con éxito. Ya puedes iniciar sesión.`,
+            timer: 4000
+          });          
         this.router.navigate(['/login']);
       },
       error: (err) => {
         this.isLoading.set(false);
         const errorMsg = err.error?.message || 'Error al completar el registro.';
-        this.snackBar.open(errorMsg, 'Cerrar', { duration: 4000 });
+        Swal.fire({
+              title: 'Error',
+              text: errorMsg,
+              timer: 4000,
+              icon: 'error'
+        });        
       }
     });
   }

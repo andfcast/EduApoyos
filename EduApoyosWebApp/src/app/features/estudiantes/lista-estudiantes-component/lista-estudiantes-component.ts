@@ -14,6 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EstudianteService } from '../../../core/services/estudiante.service';
 import { Estudiante } from '../../../core/models/estudiante.models';
 import { EstudianteFormDialogComponent } from '../estudiante-form-dialog-component/estudiante-form-dialog-component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-lista-estudiantes-component',
@@ -21,8 +22,7 @@ import { EstudianteFormDialogComponent } from '../estudiante-form-dialog-compone
   imports: [MatTableModule,
     MatPaginatorModule,
     MatSortModule,
-    MatDialogModule,
-    MatSnackBarModule,
+    MatDialogModule,    
     MatChipsModule,
     MatButtonModule,
     MatIconModule,
@@ -35,8 +35,7 @@ import { EstudianteFormDialogComponent } from '../estudiante-form-dialog-compone
 })
 export class ListaEstudiantesComponent {
   private estudiantesService = inject(EstudianteService);
-  private dialog = inject(MatDialog);
-  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);  
   isLoading = signal<boolean>(false);
   dataSource = new MatTableDataSource<Estudiante>([]);
 
@@ -66,8 +65,13 @@ export class ListaEstudiantesComponent {
         this.dataSource.sort = this.sort;
         this.isLoading.set(false);
       },
-      error: () => {
-        this.snackBar.open('Error al obtener estudiantes', 'Cerrar', { duration: 3000 });
+      error: () => {        
+        Swal.fire({
+          title: 'Error',
+          text: 'Error al obtener estudiantes',
+          timer: 3000,
+          icon: 'error'
+        });
         this.isLoading.set(false);
       }
     });
@@ -89,10 +93,19 @@ export class ListaEstudiantesComponent {
       if (nuevoEstudiante) {
         this.estudiantesService.registrar(nuevoEstudiante).subscribe({
           next: () => {
-            this.snackBar.open('Estudiante registrado exitosamente', 'Cerrar', { duration: 3000 });
+            Swal.fire({
+              icon:'success',              
+              text: `Estudiante registrado exitosamente`,
+              timer: 3000
+            });            
             this.cargarEstudiantes();
           },
-          error: () => this.snackBar.open('Error al crear estudiante', 'Cerrar', { duration: 3000 })
+          error: () => Swal.fire({
+                            title: 'Error',
+                            text: 'Error al crear estudiante',
+                            timer: 3000,
+                            icon: 'error'
+                      })                        
         });
       }
     });
@@ -108,24 +121,21 @@ export class ListaEstudiantesComponent {
       if (estudianteEditado) {
         this.estudiantesService.actualizar(estudianteEditado).subscribe({
           next: () => {
-            this.snackBar.open('Estudiante actualizado exitosamente', 'Cerrar', { duration: 3000 });
+            Swal.fire({
+              icon:'success',              
+              text: `Estudiante actualizado exitosamente`,
+              timer: 3000
+            }); 
             this.cargarEstudiantes();
           },
-          error: () => this.snackBar.open('Error al actualizar estudiante', 'Cerrar', { duration: 3000 })
+          error: () => Swal.fire({
+                            title: 'Error',
+                            text: 'Error al actualizar estudiante',
+                            timer: 3000,
+                            icon: 'error'
+                      }) 
         });
       }
     });
-  }
-
-  // eliminarEstudiante(estudiante: Estudiante): void {
-    // if (confirm(`¿Inactivar/Eliminar al estudiante ${estudiante.nombreCompleto}?`)) {
-    //   this.estudiantesService.eliminar(estudiante.id).subscribe({
-    //     next: () => {
-    //       this.snackBar.open('Registro modificado correctamente', 'Cerrar', { duration: 3000 });
-    //       this.cargarEstudiantes();
-    //     },
-    //     error: () => this.snackBar.open('Error al eliminar estudiante', 'Cerrar', { duration: 3000 })
-    //   });
-    // }
-  // }
+  }  
 }

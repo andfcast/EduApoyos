@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 
 import { AuthService } from '../../core/services/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-main-layout-component',
@@ -31,5 +32,11 @@ export class MainLayoutComponent {
 
   logout(): void {
     this.authService.logout();
+    Swal.fire({
+      icon:'info',
+      title: '¡Atención!',
+      text: 'Sesión finalizada exitosamente',
+      timer: 3000
+    });
   }
 }

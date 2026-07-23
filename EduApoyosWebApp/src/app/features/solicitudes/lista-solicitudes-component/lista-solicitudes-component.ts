@@ -12,7 +12,6 @@ import { AuthService } from '../../../core/services/auth.service';
 import { FiltroSolicitud, Solicitud } from '../../../core/models/solicitud.models';
 import { SolicitudesService } from '../../../core/services/solicitud.service';
 import { SolicitudFormDialogComponent } from '../solicitud-form-dialog-component/solicitud-form-dialog-component';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -20,6 +19,7 @@ import { DetalleSolicitudDialogComponent } from '../detalle-solicitud-dialog-com
 import { EstudianteService } from '../../../core/services/estudiante.service';
 import { CatalogoService } from '../../../core/services/catalogo.service';
 import { EstadoSolicitud, TipoApoyo } from '../../../core/models/general.models';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-lista-solicitudes-component',
@@ -48,8 +48,7 @@ export class ListaSolicitudesComponent implements OnInit{
   private estudianteService = inject(EstudianteService);
   public authService = inject(AuthService); 
   private dialog = inject(MatDialog);
-  private snackBar = inject(MatSnackBar);
-
+  
   // Columnas a visibilizar en la tabla
   displayedColumns: string[] = ['estudiante', 'tipoApoyo', 'monto', 'fecha', 'estado', 'acciones'];
   dataSource = signal<Solicitud[]>([]);
@@ -117,7 +116,7 @@ export class ListaSolicitudesComponent implements OnInit{
   }
 
   aplicarFiltros(): void {
-    this.paginaActual.set(0); // Reiniciar a la primera página al filtrar
+    this.paginaActual.set(0);
     this.cargarSolicitudes();
   }
 
@@ -134,9 +133,7 @@ export class ListaSolicitudesComponent implements OnInit{
     this.cargarSolicitudes();
   }
 
-  abrirModalCrear(): void {
-    //if (!this.authService.esAsesor()) return;
-
+  abrirModalCrear(): void {    
     const dialogRef = this.dialog.open(SolicitudFormDialogComponent, {
       width: '600px',
       disableClose: true
@@ -146,11 +143,23 @@ export class ListaSolicitudesComponent implements OnInit{
       if (dtoResult) {
         // Invoca el endpoint de guardado POST /api/solicitudes
         this.solicitudesService.crearSolicitud(dtoResult).subscribe({
-          next: () => { 
-            this.snackBar.open('Solicitud registrada correctamente', 'OK', { duration: 2500 });
+          next: () => {
+            Swal.fire({
+              icon:'success',              
+              text: `Solicitud registrada correctamente`,
+              timer: 2500
+            });                
             this.cargarSolicitudes(); 
           },
-          error: (err) => console.error('Error al registrar la solicitud:', err)
+          error: (err) => {
+                console.error('Error al registrar la solicitud:', err);
+                Swal.fire({
+                      title: 'Error',
+                      text: 'Error al registrar la solicitud',
+                      timer: 3000,
+                      icon: 'error'
+                }) 
+          }
         });
       }
     });
@@ -158,15 +167,46 @@ export class ListaSolicitudesComponent implements OnInit{
 
   cambiarEstado(solicitudId: string, nuevoEstadoId: number): void {
     if (!this.authService.esAsesor()) return;
+    let verbo = '';
+    switch(nuevoEstadoId){
+      case 2: verbo = 'avanzar en'; break;
+      case 3: verbo = 'aprobar'; break;
+      case 4: verbo = 'rechazar'; break;
+    }
+    //let usuarioId = this.authService.getUserId()!;
+    Swal.fire({
+      title: "¿Está seguro de " + verbo + " la solicitud?",
+      text: "Esta acción no se puede revertir",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: "No"
+    }).then((result) =>{
+      if(result.isConfirmed){
+        this.aplicarCambioEstado(solicitudId,nuevoEstadoId)
+      }
+    });    
+  }
+
+  private aplicarCambioEstado(solicitudId: string, nuevoEstadoId: number){
     let usuarioId = this.authService.getUserId()!;
     this.solicitudesService.cambiarEstadoSolicitud(solicitudId, nuevoEstadoId, usuarioId).subscribe({
-      next: () => {
-        this.snackBar.open('Estado actualizado correctamente', 'OK', { duration: 2500 });
-        this.cargarSolicitudes(); // Recarga y refresca la tabla al instante
+      next: () => {        
+        Swal.fire({
+          icon:'success',              
+          text: `Estado actualizado correctamente`,
+          timer: 2500
+        });
+        this.cargarSolicitudes();
       },
       error: (err) => {
         console.error('Error al cambiar el estado:', err);
-        this.snackBar.open('Error al actualizar el estado de la solicitud', 'Cerrar', { duration: 3000 });
+        Swal.fire({
+              title: 'Error',
+              text: 'Error al actualizar el estado de la solicitud',
+              timer: 3000,
+              icon: 'error'
+        });        
       }
     });
   }
@@ -174,7 +214,7 @@ export class ListaSolicitudesComponent implements OnInit{
   verDetalle(solicitud: Solicitud): void {
     this.dialog.open(DetalleSolicitudDialogComponent, {
       width: '500px',
-      data: solicitud // Inyectamos toda la data de la fila al modal
+      data: solicitud
     });
   }
 
