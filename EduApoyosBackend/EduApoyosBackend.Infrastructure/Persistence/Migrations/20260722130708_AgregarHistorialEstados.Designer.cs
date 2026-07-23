@@ -131,7 +131,7 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("SolicitudId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UsuarioId")
+                    b.Property<Guid?>("UsuarioId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -210,7 +210,7 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AsesorId")
+                    b.Property<Guid?>("AsesorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Descripcion")

@@ -22,15 +22,6 @@ namespace EduApoyosBackend.API.Controllers
             _logger = logger;
         }
 
-        //[HttpGet]
-        //[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<SolicitudApoyoDto>))]
-        //public async Task<IActionResult> Get()
-        //{
-        //    _logger.LogInformation("Intentando obtener las solicitudes");
-        //    var result = await _service.ObtenerSolicitudesAsync();
-        //    return Ok(result);
-        //}
-
         /// <summary>
         /// GET /api/solicitudes
         /// Parámetros en query string: tipoApoyoId, fecha, estadoId, pagina, tamanoPagina

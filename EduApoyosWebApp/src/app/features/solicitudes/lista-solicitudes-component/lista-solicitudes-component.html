@@ -4,16 +4,16 @@
     <p>Revisión, dictamen y registro de solicitudes académicas y socioeconómicas</p>
   </div>
 
-  <!-- 🔒 Botón de creación exclusivo para el Asesor -->
-  @if (authService.esAsesor()) {
+  
     <button mat-raised-button color="primary" (click)="abrirModalCrear()">
       <mat-icon>add_circle</mat-icon> Nueva Solicitud
     </button>
-  }
+  
 </div>
 
 <div class="table-container mat-elevation-z2">
   <!-- Barra de Filtros -->
+  @if(authService.esAsesor()){
   <div class="filter-header">
     <mat-form-field appearance="outline" class="filtro-field">
       <mat-label>Tipo de Apoyo</mat-label>
@@ -55,6 +55,7 @@
     </div>
 
   </div>
+}
 
   <!-- Tabla de Solicitudes -->
   <table mat-table [dataSource]="dataSource()">

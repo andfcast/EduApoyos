@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260721213135_AgregarSolicitud")]
-    partial class AgregarSolicitud
+    [Migration("20260722234755_ActualzacionFK")]
+    partial class ActualzacionFK
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -131,7 +131,7 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("SolicitudId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UsuarioId")
+                    b.Property<Guid?>("UsuarioId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -228,6 +228,9 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTime>("FechaSolicitud")
                         .HasColumnType("datetime2");
+
+                    b.Property<double>("MontoSolicitado")
+                        .HasColumnType("float");
 
                     b.Property<int>("TipoApoyoId")
                         .HasColumnType("int");
@@ -407,8 +410,7 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
                     b.HasOne("EduApoyosBackend.Domain.Entities.Usuario", "Usuario")
                         .WithMany()
                         .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("EstadoAnterior");
 
@@ -424,8 +426,7 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
                     b.HasOne("EduApoyosBackend.Domain.Entities.Usuario", "Asesor")
                         .WithMany()
                         .HasForeignKey("AsesorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("EduApoyosBackend.Domain.Entities.EstadoSolicitud", "EstadoSolicitud")
                         .WithMany()

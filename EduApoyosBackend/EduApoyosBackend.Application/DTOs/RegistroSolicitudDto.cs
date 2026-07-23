@@ -35,7 +35,7 @@ namespace EduApoyosBackend.Application.DTOs
 
         [DataType(DataType.DateTime)]
         public DateTime FechaActualizacion { get; set; } = DateTime.UtcNow;        
-        public Guid AsesorId { get; set; } = Guid.Empty;
+        public Guid? AsesorId { get; set; } = null;
 
     }
 }

@@ -46,9 +46,9 @@ export class SolicitudFormDialogComponent implements OnInit {
   }
 
   private initForm(): void {    
-    const asesorId = this.authService.esAsesor() ? this.authService.getUserId() : '';
+    const asesorId = this.authService.esAsesor() ? this.authService.getUserId() : '00000000-0000-0000-0000-000000000000';
     const estudianteId = this.authService.esEstudiante() ? this.authService.getUserId() : '';
-
+    
     this.form = this.fb.group({
       id: [crypto.randomUUID()],
       estudianteId: [estudianteId, [Validators.required]],

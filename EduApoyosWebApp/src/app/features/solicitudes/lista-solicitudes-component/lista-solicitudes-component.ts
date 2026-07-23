@@ -135,7 +135,7 @@ export class ListaSolicitudesComponent implements OnInit{
   }
 
   abrirModalCrear(): void {
-    if (!this.authService.esAsesor()) return;
+    //if (!this.authService.esAsesor()) return;
 
     const dialogRef = this.dialog.open(SolicitudFormDialogComponent, {
       width: '600px',

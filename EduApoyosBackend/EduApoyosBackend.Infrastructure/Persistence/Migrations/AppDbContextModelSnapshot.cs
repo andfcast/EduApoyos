@@ -128,7 +128,7 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("SolicitudId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UsuarioId")
+                    b.Property<Guid?>("UsuarioId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -207,7 +207,7 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AsesorId")
+                    b.Property<Guid?>("AsesorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Descripcion")
@@ -407,8 +407,7 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
                     b.HasOne("EduApoyosBackend.Domain.Entities.Usuario", "Usuario")
                         .WithMany()
                         .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("EstadoAnterior");
 
@@ -424,8 +423,7 @@ namespace EduApoyosBackend.Infrastructure.Persistence.Migrations
                     b.HasOne("EduApoyosBackend.Domain.Entities.Usuario", "Asesor")
                         .WithMany()
                         .HasForeignKey("AsesorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("EduApoyosBackend.Domain.Entities.EstadoSolicitud", "EstadoSolicitud")
                         .WithMany()

@@ -36,12 +36,13 @@ namespace EduApoyosBackend.Application.Services
                 {
                     Id = h.Id,
                     SolicitudId = h.SolicitudId,
-                    EstadoAnterior = h.EstadoAnteriorId == 0 ? string.Empty : h.EstadoAnterior.Nombre,
-                    EstadoSiguiente = h.EstadoNuevo.Nombre,
+                    EstadoAnterior = h.EstadoAnteriorId == null || h.EstadoAnteriorId == 0 ? string.Empty : (h.EstadoAnterior != null ? h.EstadoAnterior.Nombre : string.Empty),
+                    EstadoSiguiente = h.EstadoNuevo != null ? h.EstadoNuevo.Nombre : string.Empty,
                     FechaCambio = h.FechaCambio,
                     Observacion = h.Observacion
                 }).ToList()
             });
+
         }
 
         public async Task<SolicitudApoyoDto> ObtenerSolicitudAsync(Guid solicitudId)
@@ -66,8 +67,8 @@ namespace EduApoyosBackend.Application.Services
                 {
                     Id = h.Id,
                     SolicitudId = h.SolicitudId,
-                    EstadoAnterior = h.EstadoAnteriorId == 0 ? string.Empty : h.EstadoAnterior.Nombre,
-                    EstadoSiguiente = h.EstadoNuevo.Nombre,
+                    EstadoAnterior = h.EstadoAnteriorId == null || h.EstadoAnteriorId == 0 ? string.Empty : (h.EstadoAnterior != null ? h.EstadoAnterior.Nombre : string.Empty),
+                    EstadoSiguiente = h.EstadoNuevo != null ? h.EstadoNuevo.Nombre : string.Empty,
                     FechaCambio = h.FechaCambio,
                     Observacion = h.Observacion
                 }).ToList()
@@ -76,32 +77,27 @@ namespace EduApoyosBackend.Application.Services
 
         public async Task<RespuestaPaginadaDto<SolicitudApoyoDto>> ObtenerSolicitudesFiltradasAsync(FiltroSolicitudDto filtro)
         {
-            // 1. Iniciamos la consulta sobre el IQueryable que expone el GenericRepository
-            var query = _unitOfWork.Solicitudes.Query();            
+           
+            var query = _unitOfWork.Solicitudes.Query();
 
-            // 3. Filtro Opcional 1: Tipo de Apoyo
             if (filtro.TipoApoyoId.HasValue && filtro.TipoApoyoId.Value > 0)
             {
                 query = query.Where(s => s.TipoApoyoId == filtro.TipoApoyoId.Value);
             }
 
-            // 4. Filtro Opcional 2: Fecha (Compara unicamente el componente Date sin la hora)
             if (filtro.Fecha.HasValue)
             {
                 var fechaFiltro = filtro.Fecha.Value.Date;
                 query = query.Where(s => s.FechaSolicitud.Date == fechaFiltro);
             }
 
-            // 5. Filtro Opcional 3: Estado
             if (filtro.EstadoId.HasValue && filtro.EstadoId.Value > 0)
             {
                 query = query.Where(s => s.EstadoSolicitudId == filtro.EstadoId.Value);
             }
 
-            // 6. Conteo total de coincidencias antes de aplicar el Skip y Take
             var totalRegistros = await query.CountAsync();
-
-            // 7. Paginación y Proyección directa a DTO
+            
             var elementos = await query
                 .OrderByDescending(s => s.FechaSolicitud)
                 .Skip((filtro.Pagina - 1) * filtro.TamanoPagina)
@@ -110,10 +106,10 @@ namespace EduApoyosBackend.Application.Services
                 {
                     Id = solicitud.Id,
                     Descripcion = solicitud.Descripcion,
-                    Estado = solicitud.EstadoSolicitud.Nombre,                    
+                    Estado = solicitud.EstadoSolicitud.Nombre,
                     FechaSolicitud = solicitud.FechaSolicitud,
                     MontoSolicitado = solicitud.MontoSolicitado,
-                    TipoApoyo = solicitud.TipoApoyo.Nombre,                    
+                    TipoApoyo = solicitud.TipoApoyo.Nombre,
                     NombreEstudiante = solicitud.Estudiante.Usuario.NombreCompleto,
                     NombreAsesor = solicitud.Asesor != null ? solicitud.Asesor.NombreCompleto : string.Empty,
                     FechaActualizacion = solicitud.FechaActualizacion,
@@ -128,8 +124,7 @@ namespace EduApoyosBackend.Application.Services
                     }).ToList()
                 })
                 .ToListAsync();
-
-            // 8. Retorno del objeto paginado
+            
             return new RespuestaPaginadaDto<SolicitudApoyoDto>
             {
                 Elementos = elementos,
@@ -141,20 +136,45 @@ namespace EduApoyosBackend.Application.Services
 
         public async Task<string> RegistrarSolicitudAsync(RegistroSolicitudDto dto)
         {
+            // Validar que el estudiante exista
+            if (dto.EstudianteId == Guid.Empty)
+                throw new InvalidOperationException("El Id del estudiante no es válido.");
+
+            // Intentar buscar el estudiante por su Id (compatibilidad con Estudiante.Id)
+            var estudianteExistente = await _unitOfWork.Estudiantes.ObtenerPorGuidAsync(dto.EstudianteId);
+            // Si no se encuentra por Id, intentar por UsuarioId (compatibilidad hacia atrás)
+            if (estudianteExistente == null)
+            {
+                var busquedaEstudiante = await _unitOfWork.Estudiantes.BuscarAsync(s => s.UsuarioId == dto.EstudianteId);
+                estudianteExistente = busquedaEstudiante.FirstOrDefault();
+            }
+
+            if (estudianteExistente == null)
+                throw new InvalidOperationException("El estudiante especificado no existe.");
+
+            // Determinar asesor a asignar: si el DTO no trae AsesorId, intentar usar un asesor existente en BD
+            Guid? asesorId = dto.AsesorId;
+            if (asesorId == null || asesorId == Guid.Empty)
+            {
+                var posibles = await _unitOfWork.Usuarios.BuscarAsync(u => u.RolId == 1);
+                var primerAsesor = posibles.FirstOrDefault();
+                asesorId = primerAsesor != null ? primerAsesor.Id : (Guid?)null;
+            }
+
             var solicitud = new Domain.Entities.SolicitudApoyo(
                 Guid.NewGuid(),
-                dto.EstudianteId,
+                estudianteExistente.Id,
                 dto.TipoApoyoId,
                 dto.MontoSolicitado,
                 dto.Descripcion,
                 1, // Estado inicial: Pendiente
                 DateTime.UtcNow,
                 DateTime.UtcNow,
-                dto.AsesorId
+                asesorId
             );
             await _unitOfWork.Solicitudes.AgregarAsync(solicitud);
             await _unitOfWork.SaveChangesAsync();
-            await _unitOfWork.HistorialEstados.AgregarAsync(new HistorialEstado(Guid.NewGuid(), solicitud.Id, 1, solicitud.EstadoSolicitudId, DateTime.UtcNow, dto.AsesorId, $"Solicitud registrada"));
+            await _unitOfWork.HistorialEstados.AgregarAsync(new HistorialEstado(Guid.NewGuid(), solicitud.Id, 1, solicitud.EstadoSolicitudId, DateTime.UtcNow, asesorId, $"Solicitud registrada"));
             await _unitOfWork.SaveChangesAsync();
             return "Solicitud registrada con éxito de manera segura.";
         }
@@ -176,7 +196,13 @@ namespace EduApoyosBackend.Application.Services
 
         public async Task<IEnumerable<SolicitudApoyoDto>> ObtenerSolicitudesXEstudianteAsync(Guid id)
         {
-            var estudiante = (await _unitOfWork.Estudiantes.BuscarAsync(x => x.UsuarioId == id)).FirstOrDefault();
+            // Intentar obtener el estudiante por Id (el controlador pasa el Id del estudiante en la ruta).
+            var estudiante = await _unitOfWork.Estudiantes.ObtenerPorGuidAsync(id);
+            // Si no existe un estudiante con ese Id, intentar por UsuarioId para mantener compatibilidad hacia atrás.
+            if (estudiante == null)
+            {
+                estudiante = (await _unitOfWork.Estudiantes.BuscarAsync(x => x.UsuarioId == id)).FirstOrDefault();
+            }
             if (estudiante == null)
                 return Enumerable.Empty<SolicitudApoyoDto>();
 

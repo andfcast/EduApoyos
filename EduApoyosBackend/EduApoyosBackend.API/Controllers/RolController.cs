@@ -19,6 +19,7 @@ namespace EduApoyosBackend.API.Controllers
             _service = service;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<RolDto>))]
         public async Task<IActionResult> Get()
